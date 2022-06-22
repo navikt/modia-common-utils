@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>no.nav.personoversikt</groupId>
+    <artifactId>modia-common-utils</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>crypto</module>
+    </modules>
+    <packaging>pom</packaging>
+    <name>modia-common-utils</name>
+
+    <properties>
+        <java.version>11</java.version>
+        <kotlin.version>1.6.21</kotlin.version>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <organization>NAV (Arbeids- og velferdsdirektoratet) - The Norwegian Labour and Welfare Administration</organization>
+            <organizationUrl>https://www.nav.no</organizationUrl>
+        </developer>
+    </developers>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/navikt/modia-common-utils</url>
+        </repository>
+    </distributionManagement>
+    <scm>
+        <developerConnection>scm:git:git@github.com:navikt/modia-common-utils.git</developerConnection>
+        <connection>scm:git:git@github.com:navikt/modia-common-utils.git</connection>
+        <url>https://github.com/navikt/modia-common-utils</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>${kotlin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.8.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>${java.version}</jvmTarget>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>include-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <!--suppress MavenModelInspection -->
+                    <argLine>${jacoco.agent.argLine} -Xmx2g</argLine>
+
+                    <!--
+                    Å sette `reuseFork` til `true` vil føre til at surefire fyrer opp en separat JVM for hver
+                    eneste testklasse.
+                    Dette fører til ekstremt treg eksekvering av tester (i ett tilfelle 4-5 min kontra
+                    20-30 sekunder om satt til `false`)
+                    Merk at å sette denne til `true` krever at man skriver tester som er godt isolerte fra hverandre.
+                    F.eks. kan det føre til problemer å sette statiske eller globale felter i klasser
+                    som gjenbrukes på tvers av testmetoder. Sørg for å lage en ny instanse av slike felter for hver
+                    testmetode ved bruk av @BeforeEach (JUnit 5) eller lignende for å unngå tilstandsfulle testklasser.
+                    Se følgende link for flere detaljer:
+                    https://maven.apache.org/surefire/maven-surefire-plugin/examples/ fork-options-and-parallel-execution.html
+                    -->
+                    <reuseForks>false</reuseForks>
+
+                    <forkCount>1C</forkCount> <!-- fyr opp 1 JVM per cpu-kjerne -->
+
+                    <argLine>-Xmx1024m</argLine> <!-- Gi nok minne for å unngå terminerende JVM-er -->
+
+                    <!-- fjerner edge-caser ved nøstede classloadere, som f.eks. hvis man tester med jetty -->
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
