@@ -10,4 +10,4 @@ mvn -B versions:set -DnewVersion="$VERSION"
 mvn -B versions:commit
 
 echo "Running release beta"
-#mvn -B --settings .github/maven-settings.xml deploy -Dmaven.wagon.http.pool=false
+mvn -B --settings .github/maven-settings.xml deploy -Dmaven.wagon.http.pool=false
