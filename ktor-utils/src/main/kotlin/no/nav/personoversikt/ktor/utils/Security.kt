@@ -3,6 +3,7 @@ package no.nav.personoversikt.ktor.utils
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.Payload
 import io.ktor.http.*
 import io.ktor.http.auth.*
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory
 import java.net.URL
 
 class Security(private val providers: List<AuthProviderConfig>) {
+    constructor(vararg providers: AuthProviderConfig) : this(providers.asList())
+
     companion object {
         const val UNAUTHENTICATED = "Unauthenticated"
         const val JWT_PARSE_ERROR = "JWT parse error"
@@ -30,7 +33,9 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val name: String,
         val encryptionKey: String? = null
     )
-    class SubjectPrincipal(val subject: String, val payload: Payload) : Principal
+    class SubjectPrincipal(val payload: Payload) : Principal {
+        val subject: String? = payload.getClaim("NAVident")?.asString() ?: payload.subject
+    }
 
     private val logger = LoggerFactory.getLogger(Security::class.java)
     private val cryptermap = providers
@@ -38,7 +43,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
         .mapNotNull { it.encryptionKey }
         .associateWith { Crypter(it) }
 
-    val authproviders: List<String?> = providers.map { it.name }
+    val authproviders: Array<String?> = providers.map { it.name }.toTypedArray()
 
     fun getSubject(call: ApplicationCall): List<String> {
         return providers.map { getSubject(call, it.cookies) }
@@ -49,7 +54,10 @@ class Security(private val providers: List<AuthProviderConfig>) {
     }
 
     context(AuthenticationConfig)
-    fun setupMock(principal: SubjectPrincipal) {
+    fun setupMock(subject: String) {
+        val token = JWT.create().withSubject(subject).sign(Algorithm.none())
+        val principal = SubjectPrincipal(JWT.decode(token))
+
         for (provider in providers) {
             val config = object : AuthenticationProvider.Config(provider.name) {}
             register(
@@ -82,7 +90,9 @@ class Security(private val providers: List<AuthProviderConfig>) {
             getToken(call, cookies)
                 ?.removePrefix("Bearer ", ignoreCase = true)
                 ?.let(JWT::decode)
-                ?.getIdent()
+                ?.let(::JWTCredential)
+                ?.let(::validateJWT)
+                ?.subject
                 ?: UNAUTHENTICATED
         } catch (e: Throwable) {
             JWT_PARSE_ERROR
@@ -107,11 +117,12 @@ class Security(private val providers: List<AuthProviderConfig>) {
             .build()
     }
 
-    private fun validateJWT(credentials: JWTCredential): Principal? {
+    private fun validateJWT(credentials: JWTCredential): SubjectPrincipal? {
         return try {
             checkNotNull(credentials.payload.audience) { "Audience was not present in jwt" }
-            val subject = checkNotNull(credentials.payload.getIdent()) { "Could not get subject from jwt" }
-            SubjectPrincipal(subject = subject, payload = credentials.payload)
+            val principal = SubjectPrincipal(payload = credentials.payload)
+            checkNotNull(principal.subject) { "Could not get subject from jwt" }
+            principal
         } catch (e: Throwable) {
             logger.error("Failed to validate JWT", e)
             null
@@ -122,9 +133,5 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val value = call.request.cookies[this.name] ?: return null
         val crypter = cryptermap[this.encryptionKey] ?: return value
         return crypter.decrypt(value).getOrNull()
-    }
-
-    private fun Payload.getIdent(): String? {
-        return getClaim("NAVident")?.asString() ?: subject
     }
 }
