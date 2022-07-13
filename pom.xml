@@ -13,6 +13,8 @@
     <name>modia-common-utils</name>
 
     <properties>
+        <kotlin.version>1.7.10</kotlin.version>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <java.version>11</java.version>
         <kotlin.version>1.6.21</kotlin.version>
     </properties>
@@ -86,6 +88,9 @@
                 </executions>
                 <configuration>
                     <jvmTarget>${java.version}</jvmTarget>
+                    <args>
+                        <arg>-Xcontext-receivers</arg>
+                    </args>
                 </configuration>
             </plugin>
             <plugin>
