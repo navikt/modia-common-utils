@@ -52,8 +52,10 @@ object Metrics {
 
             routing {
                 route(config.contextpath) {
-                    get("metrics") {
-                        call.respondText(Registry.scrape())
+                    route("internal") {
+                        get("metrics") {
+                            call.respondText(Registry.scrape())
+                        }
                     }
                 }
             }

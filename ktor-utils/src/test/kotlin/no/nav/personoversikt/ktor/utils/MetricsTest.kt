@@ -14,7 +14,7 @@ internal class MetricsTest {
         application {
             install(Metrics.Plugin)
         }
-        val response = client.get("/metrics")
+        val response = client.get("/internal/metrics")
         assertEquals(HttpStatusCode.OK, response.status)
         assertNotNull(response.bodyAsText())
     }
@@ -26,7 +26,7 @@ internal class MetricsTest {
                 contextpath = "myapp"
             }
         }
-        val response = client.get("myapp/metrics")
+        val response = client.get("myapp/internal/metrics")
         assertEquals(HttpStatusCode.OK, response.status)
         assertNotNull(response.bodyAsText())
     }
@@ -43,7 +43,7 @@ internal class MetricsTest {
         val counter = Metrics.Registry.counter("testcounter")
         counter.increment(13.0)
 
-        val response = client.get("metrics")
+        val response = client.get("/internal/metrics")
         assertEquals(HttpStatusCode.OK, response.status)
         assertTrue(response.bodyAsText().contains("testcounter_total 13.0"))
     }
