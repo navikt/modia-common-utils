@@ -45,9 +45,9 @@ application {
     
     install(Authentication) {
         if (useMock) {
-            security.setupMock(SubjectPrincipal("Z999999"))
+            security.setupMock(this, SubjectPrincipal("Z999999"))
         } else {
-            security.setupJWT()
+            security.setupJWT(this)
         }
     }
 }

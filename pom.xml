@@ -100,9 +100,6 @@
                 </executions>
                 <configuration>
                     <jvmTarget>${java.version}</jvmTarget>
-                    <args>
-                        <arg>-Xcontext-receivers</arg>
-                    </args>
                 </configuration>
             </plugin>
             <plugin>

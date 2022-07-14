@@ -53,14 +53,13 @@ class Security(private val providers: List<AuthProviderConfig>) {
         return providers.map { getToken(call, it.cookies) }
     }
 
-    context(AuthenticationConfig)
-    fun setupMock(subject: String) {
+    fun setupMock(context: AuthenticationConfig, subject: String) {
         val token = JWT.create().withSubject(subject).sign(Algorithm.none())
         val principal = SubjectPrincipal(JWT.decode(token))
 
         for (provider in providers) {
             val config = object : AuthenticationProvider.Config(provider.name) {}
-            register(
+            context.register(
                 object : AuthenticationProvider(config) {
                     override suspend fun onAuthenticate(context: AuthenticationContext) {
                         context.principal = principal
@@ -70,10 +69,9 @@ class Security(private val providers: List<AuthProviderConfig>) {
         }
     }
 
-    context(AuthenticationConfig)
-    fun setupJWT() {
+    fun setupJWT(context: AuthenticationConfig) {
         for (provider in providers) {
-            jwt {
+            context.jwt {
                 if (provider.cookies.isNotEmpty()) {
                     authHeader {
                         parseAuthorizationHeader(getToken(it, provider.cookies) ?: "")
