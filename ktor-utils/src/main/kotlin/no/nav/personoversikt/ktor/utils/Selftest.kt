@@ -55,6 +55,15 @@ object Selftest {
         suspend fun reportError(error: Throwable) {
             channel.send(ErrorEvent(this, error))
         }
+
+        suspend fun ping(fn: suspend () -> Unit) {
+            try {
+                fn()
+                reportOk()
+            } catch (e: Throwable) {
+                reportError(e)
+            }
+        }
     }
 
     val Plugin = createApplicationPlugin("Selftest", { Config() }) {

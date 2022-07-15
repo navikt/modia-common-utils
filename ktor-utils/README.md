@@ -88,17 +88,10 @@ class DummyService {
     init {
         fixedRateTimer("ping", daemon = true, period = 10.seconds.inWholeMilliseconds) {
             runBlocking {
-                ping()
+                reporter.ping {
+                    // TODO implementer sjekk som kaster Exception ved feil her
+                }
             }
-        }
-    }
-    
-    suspend fun ping() {
-        try {
-            // TODO implementer sjekk her
-            reporter.reportOk()
-        } catch(e: Throwable) {
-            reporter.reportError(e)
         }
     }
 }
