@@ -33,7 +33,9 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val name: String,
         val encryptionKey: String? = null
     )
-    class SubjectPrincipal(val payload: Payload) : Principal {
+    class SubjectPrincipal(val token: String, val payload: Payload) : Principal {
+        constructor(token: String) : this(token, JWT.decode(token))
+
         val subject: String? = payload.getClaim("NAVident")?.asString() ?: payload.subject
     }
 
@@ -46,16 +48,16 @@ class Security(private val providers: List<AuthProviderConfig>) {
     val authproviders: Array<String?> = providers.map { it.name }.toTypedArray()
 
     fun getSubject(call: ApplicationCall): List<String> {
-        return providers.map { getSubject(call, it.cookies) }
+        return providers.map { getSubject(call, it) }
     }
 
     fun getToken(call: ApplicationCall): List<String?> {
-        return providers.map { getToken(call, it.cookies) }
+        return providers.map { getToken(call, it) }
     }
 
     fun setupMock(context: AuthenticationConfig, subject: String) {
         val token = JWT.create().withSubject(subject).sign(Algorithm.none())
-        val principal = SubjectPrincipal(JWT.decode(token))
+        val principal = SubjectPrincipal(token)
 
         for (provider in providers) {
             val config = object : AuthenticationProvider.Config(provider.name) {}
@@ -74,22 +76,22 @@ class Security(private val providers: List<AuthProviderConfig>) {
             context.jwt(provider.name) {
                 if (provider.cookies.isNotEmpty()) {
                     authHeader {
-                        parseAuthorizationHeader(getToken(it, provider.cookies) ?: "")
+                        parseAuthorizationHeader(getToken(it, provider) ?: "")
                     }
                 }
                 verifier(makeJwkProvider(provider.jwksUrl))
-                validate { validateJWT(it) }
+                validate { validateJWT(it, provider) }
             }
         }
     }
 
-    private fun getSubject(call: ApplicationCall, cookies: List<AuthCookie>): String {
+    private fun getSubject(call: ApplicationCall, provider: AuthProviderConfig): String {
         return try {
-            getToken(call, cookies)
+            getToken(call, provider)
                 ?.removePrefix("Bearer ", ignoreCase = true)
                 ?.let(JWT::decode)
                 ?.let(::JWTCredential)
-                ?.let(::validateJWT)
+                ?.let { call.validateJWT(it, provider) }
                 ?.subject
                 ?: UNAUTHENTICATED
         } catch (e: Throwable) {
@@ -97,8 +99,8 @@ class Security(private val providers: List<AuthProviderConfig>) {
         }
     }
 
-    private fun getToken(call: ApplicationCall, cookies: List<AuthCookie>): String? {
-        return call.request.header(HttpHeaders.Authorization) ?: getTokenFromCookies(call, cookies)
+    private fun getToken(call: ApplicationCall, provider: AuthProviderConfig): String? {
+        return call.request.header(HttpHeaders.Authorization) ?: getTokenFromCookies(call, provider.cookies)
     }
 
     private fun getTokenFromCookies(call: ApplicationCall, cookies: List<AuthCookie>): String? {
@@ -115,10 +117,11 @@ class Security(private val providers: List<AuthProviderConfig>) {
             .build()
     }
 
-    private fun validateJWT(credentials: JWTCredential): SubjectPrincipal? {
+    private fun ApplicationCall.validateJWT(credentials: JWTCredential, provider: AuthProviderConfig): SubjectPrincipal? {
         return try {
             checkNotNull(credentials.payload.audience) { "Audience was not present in jwt" }
-            val principal = SubjectPrincipal(payload = credentials.payload)
+            val token = checkNotNull(getToken(this, provider)) { "Could not get JWT for provider '${provider.name}'" }
+            val principal = SubjectPrincipal(token = token, payload = credentials.payload)
             checkNotNull(principal.subject) { "Could not get subject from jwt" }
             principal
         } catch (e: Throwable) {
