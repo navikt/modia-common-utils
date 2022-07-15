@@ -5,11 +5,13 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class SelftestTest {
     @BeforeEach
@@ -32,15 +34,12 @@ internal class SelftestTest {
             isReady = HttpStatusCode.OK,
         )
 
-        client
-            .get("/internal/selftest")
-            .assertEquals(
-                status = HttpStatusCode.OK,
-                content = """
+        assertSelftestContent(
+            content = """
                     Appname: testapp
                     Version: 1.0.0
-                """.trimIndent(),
-            )
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -60,15 +59,13 @@ internal class SelftestTest {
             isReady = HttpStatusCode.OK,
         )
 
-        client
-            .get("myapp/internal/selftest")
-            .assertEquals(
-                status = HttpStatusCode.OK,
-                content = """
+        assertSelftestContent(
+            contextpath = "myapp",
+            content = """
                     Appname: testapp
                     Version: 1.0.0
-                """.trimIndent(),
-            )
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -158,50 +155,41 @@ internal class SelftestTest {
         val nonCritical = Selftest.Reporter("dependency", critical = false)
         val critical = Selftest.Reporter("other-dependency", critical = true)
 
-        client
-            .get("/internal/selftest")
-            .assertEquals(
-                status = HttpStatusCode.OK,
-                content = """
+        assertSelftestContent(
+            content = """
                     Appname: testapp
                     Version: 1.0.0
                     
                     Name: dependency  Status: Registered
                     Name: other-dependency (Critical) Status: Registered
-                """.trimIndent(),
-            )
+            """.trimIndent()
+        )
 
         nonCritical.reportOk()
         critical.reportOk()
 
-        client
-            .get("/internal/selftest")
-            .assertEquals(
-                status = HttpStatusCode.OK,
-                content = """
+        assertSelftestContent(
+            content = """
                     Appname: testapp
                     Version: 1.0.0
                     
                     Name: dependency  Status: OK
                     Name: other-dependency (Critical) Status: OK
-                """.trimIndent(),
-            )
+            """.trimIndent()
+        )
 
         nonCritical.reportError(IllegalStateException("Non critical error"))
         critical.reportError(IllegalStateException("Critical error"))
 
-        client
-            .get("/internal/selftest")
-            .assertEquals(
-                status = HttpStatusCode.OK,
-                content = """
-                    Appname: testapp
-                    Version: 1.0.0
-                    
-                    Name: dependency  Status: KO: Non critical error
-                    Name: other-dependency (Critical) Status: KO: Critical error
-                """.trimIndent(),
-            )
+        assertSelftestContent(
+            content = """
+                Appname: testapp
+                Version: 1.0.0
+                
+                Name: dependency  Status: KO: Non critical error
+                Name: other-dependency (Critical) Status: KO: Critical error
+            """.trimIndent()
+        )
     }
 
     private suspend fun ApplicationTestBuilder.assertNaisRoutes(
@@ -210,6 +198,7 @@ internal class SelftestTest {
         isAlive: HttpStatusCode,
         isReady: HttpStatusCode
     ) {
+        delay(50.milliseconds) // Allow changes to propagate to selftest
         val base = if (contextpath != null) "$contextpath/" else ""
         assertAll(
             heading = heading,
@@ -234,6 +223,17 @@ internal class SelftestTest {
                 }
             }
         )
+    }
+
+    private suspend fun ApplicationTestBuilder.assertSelftestContent(contextpath: String? = null, content: String) {
+        delay(50.milliseconds) // Allow changes to propagate to selftest
+        val base = if (contextpath != null) "$contextpath/" else ""
+        client
+            .get("${base}internal/selftest")
+            .assertEquals(
+                status = HttpStatusCode.OK,
+                content = content,
+            )
     }
 
     private suspend fun HttpResponse.assertEquals(status: HttpStatusCode, content: String) {
