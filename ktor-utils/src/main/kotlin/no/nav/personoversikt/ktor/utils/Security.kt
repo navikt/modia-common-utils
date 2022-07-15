@@ -71,7 +71,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
 
     fun setupJWT(context: AuthenticationConfig) {
         for (provider in providers) {
-            context.jwt {
+            context.jwt(provider.name) {
                 if (provider.cookies.isNotEmpty()) {
                     authHeader {
                         parseAuthorizationHeader(getToken(it, provider.cookies) ?: "")
