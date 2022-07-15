@@ -21,4 +21,19 @@ object StringUtils {
         }
         return indices
     }
+
+    fun String.removePrefix(prefix: CharSequence, ignoreCase: Boolean = false): String {
+        if (this.startsWith(prefix, ignoreCase)) {
+            return this.substring(prefix.length)
+        }
+        return this
+    }
+
+    fun String.addPrefixIfMissing(prefix: String, ignoreCase: Boolean = false): String {
+        return if (this.startsWith(prefix, ignoreCase)) {
+            this
+        } else {
+            "$prefix$this"
+        }
+    }
 }

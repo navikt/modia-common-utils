@@ -1,5 +1,6 @@
 package no.nav.personoversikt.utils
 
+import no.nav.personoversikt.utils.StringUtils.addPrefixIfMissing
 import no.nav.personoversikt.utils.StringUtils.cutoff
 import no.nav.personoversikt.utils.StringUtils.indicesOf
 import no.nav.personoversikt.utils.StringUtils.isLetters
@@ -50,5 +51,19 @@ internal class StringUtilsTest {
         val text = "abc.def.ghi"
         val indices = text.indicesOf(".")
         assertEquals(listOf(3, 7), indices)
+    }
+
+    @Test
+    internal fun `'addPrefixIfMissing' should not add prefix if already present`() {
+        val text = "bearer 123"
+        assertEquals(text, text.addPrefixIfMissing("bearer "))
+        assertEquals(text, text.addPrefixIfMissing("Bearer ", ignoreCase = true))
+    }
+
+    @Test
+    internal fun `'addPrefixIfMissing' should add prefix if missing`() {
+        val text = "prefix 123"
+        assertEquals(text, text.addPrefixIfMissing("prefix "))
+        assertEquals("Prefix $text", text.addPrefixIfMissing("Prefix ", ignoreCase = false))
     }
 }
