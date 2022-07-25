@@ -5,12 +5,24 @@ import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.Payload
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.auth.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import no.nav.personoversikt.crypto.Crypter
 import no.nav.personoversikt.utils.StringUtils.addPrefixIfMissing
 import no.nav.personoversikt.utils.StringUtils.removePrefix
@@ -24,9 +36,40 @@ class Security(private val providers: List<AuthProviderConfig>) {
         const val UNAUTHENTICATED = "Unauthenticated"
         const val JWT_PARSE_ERROR = "JWT parse error"
     }
+
+    @Serializable
+    private class OidcDiscoveryConfig(
+        @SerialName("jwks_uri") val jwksUrl: String,
+        @SerialName("issuer") val issuer: String,
+    )
+    sealed interface JwksConfig {
+        val jwksUrl: String
+        val issuer: String
+
+        class JwksUrl(override val jwksUrl: String, override val issuer: String) : JwksConfig
+        class OidcWellKnownUrl(private val url: String, engine: HttpClientEngine = CIO.create()) : JwksConfig {
+            private val httpClient = HttpClient(engine) {
+                install(ContentNegotiation) {
+                    json(
+                        Json {
+                            ignoreUnknownKeys = true
+                        }
+                    )
+                }
+            }
+
+            private val config: OidcDiscoveryConfig by lazy { runBlocking(Dispatchers.IO) { fetchConfig() } }
+            override val jwksUrl: String by lazy { config.jwksUrl }
+            override val issuer: String by lazy { config.issuer }
+
+            private suspend fun fetchConfig(): OidcDiscoveryConfig {
+                return httpClient.get(URL(url)).body()
+            }
+        }
+    }
     data class AuthProviderConfig(
         val name: String?,
-        val jwksUrl: String,
+        val jwksConfig: JwksConfig,
         val tokenLocations: List<TokenLocation> = emptyList()
     )
 
@@ -98,7 +141,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
                 authHeader {
                     parseAuthorizationHeader(getToken(it, provider) ?: "")
                 }
-                verifier(makeJwkProvider(provider.jwksUrl))
+                verifier(makeJwkProvider(provider.jwksConfig.jwksUrl))
                 validate { validateJWT(it, provider) }
             }
         }
@@ -135,6 +178,9 @@ class Security(private val providers: List<AuthProviderConfig>) {
     private fun ApplicationCall.validateJWT(credentials: JWTCredential, provider: AuthProviderConfig): SubjectPrincipal? {
         return try {
             checkNotNull(credentials.payload.audience) { "Audience was not present in jwt" }
+            check(credentials.payload.issuer == provider.jwksConfig.issuer) {
+                "Issuer did not match provider config. Expected: '${provider.jwksConfig.issuer}', but got: '${credentials.payload.issuer}'"
+            }
             val token = checkNotNull(getToken(this, provider)) { "Could not get JWT for provider '${provider.name}'" }
             val principal = SubjectPrincipal(token = token, payload = credentials.payload)
             checkNotNull(principal.subject) { "Could not get subject from jwt" }
