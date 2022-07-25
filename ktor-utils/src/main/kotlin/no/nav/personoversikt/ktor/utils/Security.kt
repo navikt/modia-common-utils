@@ -24,15 +24,36 @@ class Security(private val providers: List<AuthProviderConfig>) {
         const val UNAUTHENTICATED = "Unauthenticated"
         const val JWT_PARSE_ERROR = "JWT parse error"
     }
-    class AuthProviderConfig(
+    data class AuthProviderConfig(
         val name: String?,
         val jwksUrl: String,
-        val cookies: List<AuthCookie> = emptyList()
+        val tokenLocations: List<TokenLocation> = emptyList()
     )
-    class AuthCookie(
-        val name: String,
-        val encryptionKey: String? = null
-    )
+
+    sealed interface TokenLocation {
+        val encryptionKey: String?
+        fun extract(call: ApplicationCall): String?
+        fun getToken(call: ApplicationCall, cryptermap: Map<String, Crypter>): String? {
+            val value = extract(call) ?: return null
+            val crypter = cryptermap[encryptionKey] ?: return value
+            return crypter.decrypt(value).getOrNull()
+        }
+
+        class Cookie(
+            private val name: String,
+            override val encryptionKey: String? = null
+        ) : TokenLocation {
+            override fun extract(call: ApplicationCall): String? = call.request.cookies[name]
+        }
+
+        class Header(
+            private val headerName: String = HttpHeaders.Authorization,
+            override val encryptionKey: String? = null
+        ) : TokenLocation {
+            override fun extract(call: ApplicationCall): String? = call.request.header(headerName)
+        }
+    }
+
     class SubjectPrincipal(val token: String, val payload: Payload) : Principal {
         constructor(token: String) : this(token, JWT.decode(token))
 
@@ -41,7 +62,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
 
     private val logger = LoggerFactory.getLogger(Security::class.java)
     private val cryptermap = providers
-        .flatMap { it.cookies }
+        .flatMap { it.tokenLocations }
         .mapNotNull { it.encryptionKey }
         .associateWith { Crypter(it) }
 
@@ -74,10 +95,8 @@ class Security(private val providers: List<AuthProviderConfig>) {
     fun setupJWT(context: AuthenticationConfig) {
         for (provider in providers) {
             context.jwt(provider.name) {
-                if (provider.cookies.isNotEmpty()) {
-                    authHeader {
-                        parseAuthorizationHeader(getToken(it, provider) ?: "")
-                    }
+                authHeader {
+                    parseAuthorizationHeader(getToken(it, provider) ?: "")
                 }
                 verifier(makeJwkProvider(provider.jwksUrl))
                 validate { validateJWT(it, provider) }
@@ -100,14 +119,10 @@ class Security(private val providers: List<AuthProviderConfig>) {
     }
 
     private fun getToken(call: ApplicationCall, provider: AuthProviderConfig): String? {
-        return call.request.header(HttpHeaders.Authorization) ?: getTokenFromCookies(call, provider.cookies)
-    }
-
-    private fun getTokenFromCookies(call: ApplicationCall, cookies: List<AuthCookie>): String? {
-        return cookies
-            .find { call.request.cookies[it.name]?.isNotEmpty() ?: false }
-            ?.getValue(call)
-            ?.addPrefixIfMissing("Bearer ", ignoreCase = true)
+        return provider.tokenLocations.firstNotNullOfOrNull { location ->
+            location.getToken(call, cryptermap)
+                ?.addPrefixIfMissing("Bearer ", ignoreCase = true)
+        }
     }
 
     private fun makeJwkProvider(jwksUrl: String): JwkProvider {
@@ -128,11 +143,5 @@ class Security(private val providers: List<AuthProviderConfig>) {
             logger.error("Failed to validate JWT", e)
             null
         }
-    }
-
-    private fun AuthCookie.getValue(call: ApplicationCall): String? {
-        val value = call.request.cookies[this.name] ?: return null
-        val crypter = cryptermap[this.encryptionKey] ?: return value
-        return crypter.decrypt(value).getOrNull()
     }
 }
