@@ -70,7 +70,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
             private suspend fun fetchConfig(): OidcDiscoveryConfig {
                 return httpClient
                     .runCatching { get(URL(url)).body<OidcDiscoveryConfig>() }
-                    .onFailure { logger.error("Could not fetch oidc-config", it) }
+                    .onFailure { logger.error("Could not fetch oidc-config from $url", it) }
                     .getOrThrow()
             }
         }
