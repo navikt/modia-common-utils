@@ -31,8 +31,8 @@ import java.net.URL
 
 class Security(private val providers: List<AuthProviderConfig>) {
     constructor(vararg providers: AuthProviderConfig) : this(providers.asList())
-
     companion object {
+        private val logger = LoggerFactory.getLogger(Security::class.java)
         const val UNAUTHENTICATED = "Unauthenticated"
         const val JWT_PARSE_ERROR = "JWT parse error"
     }
@@ -63,7 +63,10 @@ class Security(private val providers: List<AuthProviderConfig>) {
             override val issuer: String by lazy { config.issuer }
 
             private suspend fun fetchConfig(): OidcDiscoveryConfig {
-                return httpClient.get(URL(url)).body()
+                return httpClient
+                    .runCatching { get(URL(url)).body<OidcDiscoveryConfig>() }
+                    .onFailure { logger.error("Could not fetch oidc-config", it) }
+                    .getOrThrow()
             }
         }
     }
@@ -103,7 +106,6 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val subject: String? = payload.getClaim("NAVident")?.asString() ?: payload.subject
     }
 
-    private val logger = LoggerFactory.getLogger(Security::class.java)
     private val cryptermap = providers
         .flatMap { it.tokenLocations }
         .mapNotNull { it.encryptionKey }
