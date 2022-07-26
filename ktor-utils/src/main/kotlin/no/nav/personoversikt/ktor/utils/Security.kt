@@ -47,13 +47,14 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val issuer: String
 
         class JwksUrl(override val jwksUrl: String, override val issuer: String) : JwksConfig
-        class OidcWellKnownUrl(private val url: String, engine: HttpClientEngine = CIO.create()) : JwksConfig {
-            private val httpClient = HttpClient(engine) {
-                engine {
+        class OidcWellKnownUrl(private val url: String, engine: HttpClientEngine = CIO_ENGINE) : JwksConfig {
+            companion object {
+                private val CIO_ENGINE = CIO.create {
                     val httpProxy = System.getenv("HTTP_PROXY")
-                    logger.info("OidcWellKnownUrl will use proxy: $httpProxy")
                     httpProxy?.let { proxy = ProxyBuilder.http(Url(it)) }
                 }
+            }
+            private val httpClient = HttpClient(engine) {
                 install(ContentNegotiation) {
                     json(
                         Json {
