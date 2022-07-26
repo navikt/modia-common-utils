@@ -49,6 +49,11 @@ class Security(private val providers: List<AuthProviderConfig>) {
         class JwksUrl(override val jwksUrl: String, override val issuer: String) : JwksConfig
         class OidcWellKnownUrl(private val url: String, engine: HttpClientEngine = CIO.create()) : JwksConfig {
             private val httpClient = HttpClient(engine) {
+                engine {
+                    System.getenv("HTTP_PROXY")?.let {
+                        proxy = ProxyBuilder.http(it)
+                    }
+                }
                 install(ContentNegotiation) {
                     json(
                         Json {
