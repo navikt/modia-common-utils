@@ -50,9 +50,9 @@ class Security(private val providers: List<AuthProviderConfig>) {
         class OidcWellKnownUrl(private val url: String, engine: HttpClientEngine = CIO.create()) : JwksConfig {
             private val httpClient = HttpClient(engine) {
                 engine {
-                    System.getenv("HTTP_PROXY")?.let {
-                        proxy = ProxyBuilder.http(it)
-                    }
+                    val httpProxy = System.getenv("HTTP_PROXY")
+                    logger.info("OidcWellKnownUrl will use proxy: $httpProxy")
+                    httpProxy?.let { proxy = ProxyBuilder.http(Url(it)) }
                 }
                 install(ContentNegotiation) {
                     json(
