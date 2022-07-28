@@ -5,24 +5,14 @@ import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.Payload
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.auth.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import no.nav.personoversikt.crypto.Crypter
 import no.nav.personoversikt.utils.StringUtils.addPrefixIfMissing
 import no.nav.personoversikt.utils.StringUtils.removePrefix
@@ -37,43 +27,18 @@ class Security(private val providers: List<AuthProviderConfig>) {
         const val JWT_PARSE_ERROR = "JWT parse error"
     }
 
-    @Serializable
-    private class OidcDiscoveryConfig(
-        @SerialName("jwks_uri") val jwksUrl: String,
-        @SerialName("issuer") val issuer: String,
-    )
     sealed interface JwksConfig {
         val jwksUrl: String
         val issuer: String
 
         class JwksUrl(override val jwksUrl: String, override val issuer: String) : JwksConfig
-        class OidcWellKnownUrl(private val url: String, engine: HttpClientEngine = CIO_ENGINE) : JwksConfig {
-            companion object {
-                private val CIO_ENGINE = CIO.create {
-                    val httpProxy = System.getenv("HTTP_PROXY")
-                    httpProxy?.let { proxy = ProxyBuilder.http(Url(it)) }
-                }
-            }
-            private val httpClient = HttpClient(engine) {
-                install(ContentNegotiation) {
-                    json(
-                        Json {
-                            ignoreUnknownKeys = true
-                        }
-                    )
-                }
-            }
+        class OidcWellKnownUrl(url: String) : JwksConfig {
+            private val oidcClient = OidcClient(url)
 
-            private val config: OidcDiscoveryConfig by lazy { runBlocking(Dispatchers.IO) { fetchConfig() } }
+            private val config: OidcClient.OidcDiscoveryConfig by lazy { runBlocking(Dispatchers.IO) { oidcClient.fetch() } }
+
             override val jwksUrl: String by lazy { config.jwksUrl }
             override val issuer: String by lazy { config.issuer }
-
-            private suspend fun fetchConfig(): OidcDiscoveryConfig {
-                return httpClient
-                    .runCatching { get(URL(url)).body<OidcDiscoveryConfig>() }
-                    .onFailure { logger.error("Could not fetch oidc-config from $url", it) }
-                    .getOrThrow()
-            }
         }
     }
     data class AuthProviderConfig(
