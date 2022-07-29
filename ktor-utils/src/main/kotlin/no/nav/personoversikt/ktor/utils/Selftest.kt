@@ -5,93 +5,37 @@ import io.ktor.server.application.*
 import io.ktor.server.application.hooks.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import no.nav.personoversikt.utils.SelftestGenerator
 
-@OptIn(DelicateCoroutinesApi::class)
 object Selftest {
     class Config(
-        var appname: String = "Not set",
-        var version: String = "Not set",
-        var contextpath: String = "",
-    )
-
-    sealed class Event(val reporter: Reporter)
-    class InitEvent(reporter: Reporter) : Event(reporter)
-    class OkEvent(reporter: Reporter) : Event(reporter)
-    class ErrorEvent(reporter: Reporter, val error: Throwable) : Event(reporter)
-
-    private val statusmap = mutableMapOf<String, Event>()
-    private val channel = Channel<Event>(capacity = Channel.BUFFERED)
-    private var aggregator = GlobalScope.launch {
-        channel.receiveAsFlow().collect {
-            statusmap[it.reporter.name] = it
-        }
-    }
-
-    internal fun restart() {
-        statusmap.clear()
-        aggregator = GlobalScope.launch {
-            channel.receiveAsFlow().collect {
-                statusmap[it.reporter.name] = it
-            }
-        }
-    }
-
-    val Status: Map<String, Event> = statusmap
-
-    class Reporter(val name: String, val critical: Boolean) {
-        init {
-            runBlocking {
-                channel.send(InitEvent(this@Reporter))
-            }
-        }
-
-        suspend fun reportOk() {
-            channel.send(OkEvent(this))
-        }
-
-        suspend fun reportError(error: Throwable) {
-            channel.send(ErrorEvent(this, error))
-        }
-
-        suspend fun ping(fn: suspend () -> Unit) {
-            try {
-                fn()
-                reportOk()
-            } catch (e: Throwable) {
-                reportError(e)
-            }
-        }
-    }
+        appname: String = "Not set",
+        version: String = "Not set",
+        var contextpath: String = ""
+    ) : SelftestGenerator.Config(appname, version)
 
     val Plugin = createApplicationPlugin("Selftest", { Config() }) {
         val plugin = this
         val config = pluginConfig
+        val selftest = SelftestGenerator(pluginConfig)
         with(application) {
             plugin.on(MonitoringEvent(ApplicationStopPreparing)) {
-                aggregator.cancel()
+                SelftestGenerator.stop()
             }
 
             routing {
                 route(config.contextpath) {
                     route("internal") {
                         get("isAlive") {
-                            val hasCriticalError = Status.values.any { it is ErrorEvent && it.reporter.critical }
-
-                            if (hasCriticalError) {
-                                call.respondText("Not alive", status = HttpStatusCode.InternalServerError)
-                            } else {
+                            if (selftest.isAlive()) {
                                 call.respondText("Alive")
+                            } else {
+                                call.respondText("Not alive", status = HttpStatusCode.InternalServerError)
                             }
                         }
 
                         get("isReady") {
-                            val isReady = Status.values.all { it !is InitEvent }
-                            val noCriticalError = Status.values.none { it is ErrorEvent && it.reporter.critical }
-
-                            if (isReady && noCriticalError) {
+                            if (selftest.isReady()) {
                                 call.respondText("Ready")
                             } else {
                                 call.respondText("Not ready", status = HttpStatusCode.InternalServerError)
@@ -99,22 +43,7 @@ object Selftest {
                         }
 
                         get("selftest") {
-                            call.respondText {
-                                buildString {
-                                    appendLine("Appname: ${config.appname}")
-                                    appendLine("Version: ${config.version}")
-                                    appendLine()
-                                    for (result in Status.values) {
-                                        val critical = if (result.reporter.critical) "(Critical)" else ""
-                                        val status = when (result) {
-                                            is InitEvent -> "Registered"
-                                            is OkEvent -> "OK"
-                                            is ErrorEvent -> "KO: ${result.error.message}"
-                                        }
-                                        appendLine("Name: ${result.reporter.name} $critical Status: $status")
-                                    }
-                                }
-                            }
+                            call.respondText(selftest.scrape())
                         }
                     }
                 }
