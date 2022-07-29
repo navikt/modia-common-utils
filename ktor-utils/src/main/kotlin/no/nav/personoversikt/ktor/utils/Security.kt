@@ -97,14 +97,11 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val principal = SubjectPrincipal(token)
 
         for (provider in providers) {
-            val config = object : AuthenticationProvider.Config(provider.name) {}
-            context.register(
-                object : AuthenticationProvider(config) {
-                    override suspend fun onAuthenticate(context: AuthenticationContext) {
-                        context.principal = principal
-                    }
+            context.provider(provider.name) {
+                authenticate {
+                    it.principal(principal)
                 }
-            )
+            }
         }
     }
 
