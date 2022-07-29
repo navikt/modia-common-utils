@@ -5,11 +5,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class RetryTest {
 
     @Test
-    fun `skal fungere uten å kjøre retry`() {
+    fun `skal fungere uten å kjøre retry`() = runBlocking {
         val scheduleMock: Timer = mockk()
         val retry = retryFactory(scheduleMock)
 
@@ -21,7 +22,7 @@ internal class RetryTest {
     }
 
     @Test
-    fun `skal kjøre retry`() {
+    fun `skal kjøre retry`() = runBlocking {
         val scheduleMock: Timer = mockk()
         val retry = retryFactory(scheduleMock)
         every { scheduleMock.schedule(any(), any<Long>()) } returns Unit
@@ -53,9 +54,9 @@ internal class RetryTest {
     private fun retryFactory(schedulerSpy: Timer) = Retry(
         Retry.Config(
             maxRetries = 5,
-            initDelay = 100,
+            initDelay = 100.milliseconds,
             growthFactor = 2.0,
-            delayLimit = 500,
+            delayLimit = 500.milliseconds,
             scheduler = schedulerSpy
         )
     )
