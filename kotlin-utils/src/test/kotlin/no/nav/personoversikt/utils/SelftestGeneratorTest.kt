@@ -120,6 +120,6 @@ internal class SelftestGeneratorTest {
 
     private fun report(block: suspend () -> Unit) = runBlocking {
         block()
-        delay(250)
+        delay(50)
     }
 }

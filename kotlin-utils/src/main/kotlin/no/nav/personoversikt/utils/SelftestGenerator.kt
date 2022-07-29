@@ -15,6 +15,10 @@ class SelftestGenerator(private val config: Config) {
             }
         }
 
+        internal fun register(event: InitEvent) {
+            statusmap[event.reporter.name] = event
+        }
+
         internal fun restart() {
             statusmap.clear()
             aggregator = GlobalScope.launch {
@@ -66,9 +70,7 @@ class SelftestGenerator(private val config: Config) {
 
     class Reporter(val name: String, val critical: Boolean) {
         init {
-            runBlocking {
-                channel.send(InitEvent(this@Reporter))
-            }
+            register(InitEvent(this))
         }
 
         suspend fun reportOk() {
