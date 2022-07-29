@@ -1,36 +1,39 @@
 package no.nav.personoversikt.utils
 
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory.getLogger
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.pow
+import kotlin.time.Duration
 
-class Retry(val config: Config) {
+class Retry(private val config: Config) {
 
     data class Config(
         val maxRetries: Int = Int.MAX_VALUE,
-        val initDelay: Long,
+        val initDelay: Duration,
         val growthFactor: Double,
-        val delayLimit: Long,
+        val delayLimit: Duration,
         val scheduler: Timer = Timer()
     )
 
     private val log = getLogger(Retry::class.java)
 
-    fun run(block: () -> Unit) = run(0, block)
+    suspend fun run(block: suspend () -> Unit) = run(0, block)
 
-    private fun run(attemptNumber: Int, block: () -> Unit) {
+    private suspend fun run(attemptNumber: Int, block: suspend () -> Unit) {
         try {
             block()
         } catch (e: Exception) {
-            val delay =
-                (config.initDelay * config.growthFactor.pow(attemptNumber)).toLong().coerceAtMost(config.delayLimit)
+            val delay = (config.initDelay * config.growthFactor.pow(attemptNumber)).coerceAtMost(config.delayLimit)
 
             log.error("Retry failed at attempt $attemptNumber with error: ${e.message}")
 
             if (attemptNumber < config.maxRetries) {
-                config.scheduler.schedule(delay) {
-                    run(attemptNumber + 1, block)
+                config.scheduler.schedule(delay.inWholeMilliseconds) {
+                    runBlocking {
+                        run(attemptNumber + 1, block)
+                    }
                 }
             }
         }
