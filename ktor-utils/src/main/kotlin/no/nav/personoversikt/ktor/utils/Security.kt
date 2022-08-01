@@ -44,7 +44,8 @@ class Security(private val providers: List<AuthProviderConfig>) {
     data class AuthProviderConfig(
         val name: String?,
         val jwksConfig: JwksConfig,
-        val tokenLocations: List<TokenLocation> = emptyList()
+        val tokenLocations: List<TokenLocation> = emptyList(),
+        val overrides: JWTAuthenticationProvider.Config.() -> Unit = {}
     )
 
     sealed interface TokenLocation {
@@ -113,6 +114,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
                 }
                 verifier(makeJwkProvider(provider.jwksConfig.jwksUrl))
                 validate { validateJWT(it, provider) }
+                apply(provider.overrides)
             }
         }
     }
