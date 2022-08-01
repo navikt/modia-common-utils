@@ -1,70 +1,53 @@
 package no.nav.personoversikt.utils
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class SelftestGeneratorTest {
-    @BeforeEach
-    internal fun setup() {
-        SelftestGenerator.restart()
-    }
+    var selftest = SelftestGenerator.getInstance(SelftestGenerator.Config(appname = "testapp", version = "1.0.0"))
 
     @AfterEach
     internal fun teardown() {
-        SelftestGenerator.stop()
+        selftest.clear()
     }
 
     @Test
     internal fun `should not be ready before every dependency has reported ok`() {
-        val selftest = SelftestGenerator(SelftestGenerator.Config(appname = "testapp", version = "1.0.0"))
         val reporter = SelftestGenerator.Reporter("dependency", critical = false)
 
         selftest.assertStatus(isAlive = true, isReady = false)
 
-        report {
-            reporter.reportOk()
-        }
+        reporter.reportOk()
 
         selftest.assertStatus(isAlive = true, isReady = true)
     }
 
     @Test
     internal fun `should mark as not alive if critical errors occur`() {
-        val selftest = SelftestGenerator(SelftestGenerator.Config(appname = "testapp", version = "1.0.0"))
         val nonCritical = SelftestGenerator.Reporter("dependency", critical = false)
         val critical = SelftestGenerator.Reporter("other-dependency", critical = true)
 
         selftest.assertStatus(isAlive = true, isReady = false)
 
-        report {
-            nonCritical.reportOk()
-            critical.reportOk()
-        }
+        nonCritical.reportOk()
+        critical.reportOk()
 
         selftest.assertStatus(isAlive = true, isReady = true)
 
-        report {
-            nonCritical.reportError(IllegalStateException("Something non-critical is wrong"))
-            critical.reportOk()
-        }
+        nonCritical.reportError(IllegalStateException("Something non-critical is wrong"))
+        critical.reportOk()
 
         selftest.assertStatus(isAlive = true, isReady = true)
 
-        report {
-            nonCritical.reportOk()
-            critical.reportError(IllegalStateException("Something critical is wrong"))
-        }
+        nonCritical.reportOk()
+        critical.reportError(IllegalStateException("Something critical is wrong"))
 
         selftest.assertStatus(isAlive = false, isReady = false)
     }
 
     @Test
     internal fun `should list all dependencies in selftest`() {
-        val selftest = SelftestGenerator(SelftestGenerator.Config(appname = "testapp", version = "1.0.0"))
         val nonCritical = SelftestGenerator.Reporter("dependency", critical = false)
         val critical = SelftestGenerator.Reporter("other-dependency", critical = true)
 
@@ -78,10 +61,8 @@ internal class SelftestGeneratorTest {
             """.trimIndent()
         )
 
-        report {
-            nonCritical.reportOk()
-            critical.reportOk()
-        }
+        nonCritical.reportOk()
+        critical.reportOk()
 
         selftest.assertSelftestContent(
             """
@@ -93,10 +74,8 @@ internal class SelftestGeneratorTest {
             """.trimIndent()
         )
 
-        report {
-            nonCritical.reportError(IllegalStateException("Non critical error"))
-            critical.reportError(IllegalStateException("Critical error"))
-        }
+        nonCritical.reportError(IllegalStateException("Non critical error"))
+        critical.reportError(IllegalStateException("Critical error"))
 
         selftest.assertSelftestContent(
             """
@@ -116,10 +95,5 @@ internal class SelftestGeneratorTest {
 
     private fun SelftestGenerator.assertSelftestContent(content: String) {
         assertEquals(content, this.scrape().trim())
-    }
-
-    private fun report(block: suspend () -> Unit) = runBlocking {
-        block()
-        delay(50)
     }
 }

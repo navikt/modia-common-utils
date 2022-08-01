@@ -2,7 +2,6 @@ package no.nav.personoversikt.ktor.utils
 
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.application.hooks.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.personoversikt.utils.SelftestGenerator
@@ -15,14 +14,9 @@ object Selftest {
     ) : SelftestGenerator.Config(appname, version)
 
     val Plugin = createApplicationPlugin("Selftest", { Config() }) {
-        val plugin = this
         val config = pluginConfig
-        val selftest = SelftestGenerator(pluginConfig)
+        val selftest = SelftestGenerator.getInstance(pluginConfig)
         with(application) {
-            plugin.on(MonitoringEvent(ApplicationStopPreparing)) {
-                SelftestGenerator.stop()
-            }
-
             routing {
                 route(config.contextpath) {
                     route("internal") {
