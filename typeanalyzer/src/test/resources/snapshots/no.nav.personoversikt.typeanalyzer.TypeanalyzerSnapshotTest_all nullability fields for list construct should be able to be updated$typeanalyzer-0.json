@@ -1,0 +1,13 @@
+{
+  "fields" : {
+    "list" : {
+      "nullable" : false,
+      "subtype" : {
+        "type" : "UNKNOWN"
+      },
+      "type" : "LIST"
+    }
+  },
+  "nullable" : false,
+  "type" : "OBJECT"
+}

@@ -1,0 +1,68 @@
+{
+  "fields" : {
+    "active" : {
+      "nullable" : true,
+      "type" : "BOOLEAN"
+    },
+    "count" : {
+      "nullable" : true,
+      "type" : "INT"
+    },
+    "countLong" : {
+      "nullable" : true,
+      "type" : "INT"
+    },
+    "emptyArray" : {
+      "nullable" : true,
+      "subtype" : {
+        "type" : "UNKNOWN"
+      },
+      "type" : "LIST"
+    },
+    "fraction" : {
+      "nullable" : true,
+      "type" : "DOUBLE"
+    },
+    "fractionFloat" : {
+      "nullable" : true,
+      "type" : "DOUBLE"
+    },
+    "id" : {
+      "nullable" : true,
+      "type" : "TEXT"
+    },
+    "listOfStuff" : {
+      "nullable" : true,
+      "subtype" : {
+        "fields" : {
+          "id" : {
+            "nullable" : true,
+            "type" : "TEXT"
+          },
+          "meta" : {
+            "fields" : {
+              "key" : {
+                "nullable" : true,
+                "type" : "TEXT"
+              },
+              "key2" : {
+                "nullable" : true,
+                "type" : "TEXT"
+              }
+            },
+            "nullable" : true,
+            "type" : "OBJECT"
+          }
+        },
+        "nullable" : true,
+        "type" : "OBJECT"
+      },
+      "type" : "LIST"
+    },
+    "nullValue" : {
+      "type" : "NULL"
+    }
+  },
+  "nullable" : true,
+  "type" : "OBJECT"
+}
