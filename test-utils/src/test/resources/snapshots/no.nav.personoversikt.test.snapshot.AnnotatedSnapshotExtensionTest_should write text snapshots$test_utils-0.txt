@@ -1,0 +1,1 @@
+DummyObject(id=ab76e36b-5001-4716-b5d6-d0c0cf95a412, name=myname, list=[1, 2, 3])
