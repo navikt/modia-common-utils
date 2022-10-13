@@ -1,6 +1,7 @@
 package no.nav.personoversikt.typeanalyzer
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.BooleanNode
 import com.fasterxml.jackson.databind.node.DoubleNode
@@ -8,14 +9,13 @@ import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
 
 class Typeanalyzer {
     private val log = LoggerFactory.getLogger(Typeanalyzer::class.java)
-    private val objectMapper = jacksonObjectMapper()
-        .registerModule(JavaTimeModule())
+    private val objectMapper = JsonMapper.builder()
+        .findAndAddModules()
+        .build()
 
     private var previousCapture: Capture? = null
     private var previousJsonNode: JsonNode? = null
