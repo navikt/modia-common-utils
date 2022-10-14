@@ -1,0 +1,22 @@
+interface Generated_2fcc7be7 {
+  id: string,
+  nullValue: null | null,
+  active: boolean,
+  count: number,
+  countLong: number,
+  fraction: number,
+  fractionFloat: number,
+  emptyArray: Array<any>,
+  listOfStuff: Array<Generated_a8baf924>,
+}
+
+interface Generated_a8baf924 {
+  id: string,
+  meta: Generated_a94e6b1e,
+}
+
+interface Generated_a94e6b1e {
+  key: string,
+  key2: string,
+}
+

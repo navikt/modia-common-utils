@@ -8,9 +8,6 @@ import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 
 interface SnapshotRunner {
-//    fun beforeSnapshotRunner(name: String)
-//    fun afterSnapshotRunner()
-
     fun assertMatches(value: Any?)
     fun updateSnapshot(value: Any?)
 

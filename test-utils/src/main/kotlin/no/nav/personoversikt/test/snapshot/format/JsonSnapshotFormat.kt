@@ -3,9 +3,8 @@ package no.nav.personoversikt.test.snapshot.format
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.personoversikt.test.snapshot.SnapshotRunner
 
 private class JsonFormat(private val mapper: ObjectMapper) : SnapshotRunner.Fileformat {
@@ -18,18 +17,17 @@ private class JsonFormat(private val mapper: ObjectMapper) : SnapshotRunner.File
     override fun read(value: String): Any = mapper.readTree(value)
 
     companion object {
-        val typed: ObjectMapper = jacksonObjectMapper()
-            .registerModule(JavaTimeModule())
+        val plain: JsonMapper = JsonMapper.builder()
+            .findAndAddModules()
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
             .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
-            .activateDefaultTyping(DefaultBaseTypeLimitingValidator())
+            .build()
 
-        val plain: ObjectMapper = jacksonObjectMapper()
-            .registerModule(JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
-            .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+        val typed: JsonMapper = plain
+            .rebuild()
+            .activateDefaultTyping(DefaultBaseTypeLimitingValidator())
+            .build()
     }
 }
 

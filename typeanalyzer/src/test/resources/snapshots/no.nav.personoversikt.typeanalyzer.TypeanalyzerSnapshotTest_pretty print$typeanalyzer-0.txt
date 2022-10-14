@@ -1,0 +1,22 @@
+data class Generated_d94e97b3(
+    val id: String,
+    val nullValue: Unit?,
+    val active: Boolean,
+    val count: Int,
+    val countLong: Int,
+    val fraction: Double,
+    val fractionFloat: Double,
+    val emptyArray: List<Any>,
+    val listOfStuff: List<Generated_53feae50>,
+)
+
+data class Generated_53feae50(
+    val id: String,
+    val meta: Generated_8cb4c22c,
+)
+
+data class Generated_8cb4c22c(
+    val key: String,
+    val key2: String,
+)
+
