@@ -1,0 +1,14 @@
+{
+  "fields" : {
+    "key1" : {
+      "nullable" : true,
+      "type" : "TEXT"
+    },
+    "key2" : {
+      "nullable" : true,
+      "type" : "TEXT"
+    }
+  },
+  "nullable" : false,
+  "type" : "OBJECT"
+}
