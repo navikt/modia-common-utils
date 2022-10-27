@@ -8,16 +8,16 @@ class TestEnvironmentExtension(
     AfterTestExecutionCallback,
     ParameterResolver {
 
-    private val runner: TestEnvironment = TestEnvironment(testEnvironment)
+    private val testEnvironment: TestEnvironment = TestEnvironment(testEnvironment)
 
     constructor(vararg pairs: Pair<String, String?>) : this(mapOf(*pairs))
 
     override fun beforeTestExecution(context: ExtensionContext) {
-        runner.beforeTestEnvironmentRunner()
+        testEnvironment.beforeTestExecution()
     }
 
     override fun afterTestExecution(context: ExtensionContext) {
-        runner.afterTestEnvironmentRunner()
+        testEnvironment.afterTestExecution()
     }
 
     override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
