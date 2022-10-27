@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 class TestEnvironmentTest {
     @Test
     internal fun `should setup environment`() {
-        TestEnvironment.runWithEnvironment(mapOf("key1" to "value1")) {
+        TestEnvironment.withEnvironment(mapOf("key1" to "value1")) {
             assertEquals("value1", System.getProperty("key1"))
         }
     }
