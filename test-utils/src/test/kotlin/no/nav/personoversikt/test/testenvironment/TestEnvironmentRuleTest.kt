@@ -12,6 +12,13 @@ class TestEnvironmentRuleTest {
     val testenvironment = TestEnvironmentRule(
         "key1" to "value1"
     )
+    @Rule
+    @JvmField
+    val lazyenvironment = TestEnvironmentRule {
+        mapOf(
+            "key2" to "value2"
+        )
+    }
 
     @Rule
     @JvmField
