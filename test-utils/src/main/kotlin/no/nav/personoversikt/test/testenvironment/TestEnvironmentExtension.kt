@@ -4,11 +4,12 @@ import org.junit.jupiter.api.extension.*
 
 class TestEnvironmentExtension(
     testEnvironment: Map<String, String?> = emptyMap(),
-    private val runner: TestEnvironmentRunnerImpl = TestEnvironmentRunnerImpl(testEnvironment)
 ) : BeforeTestExecutionCallback,
     AfterTestExecutionCallback,
-    ParameterResolver,
-    TestEnvironmentRunner by TestEnvironmentRunnerImpl(testEnvironment) {
+    ParameterResolver {
+
+    private val runner: TestEnvironment = TestEnvironment(testEnvironment)
+
     constructor(vararg pairs: Pair<String, String?>) : this(mapOf(*pairs))
 
     override fun beforeTestExecution(context: ExtensionContext) {

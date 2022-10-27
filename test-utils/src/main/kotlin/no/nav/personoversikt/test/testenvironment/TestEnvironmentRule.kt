@@ -6,10 +6,9 @@ import org.junit.runners.model.Statement
 
 class TestEnvironmentRule(
     testEnvironment: Map<String, String?>
-) : MethodRule,
-    TestEnvironmentRunner by TestEnvironmentRunnerImpl(testEnvironment) {
+) : MethodRule {
 
-    val runner = TestEnvironmentRunnerImpl(testEnvironment)
+    val runner = TestEnvironment(testEnvironment)
 
     constructor(vararg pairs: Pair<String, String?>) : this(mapOf(*pairs))
 
