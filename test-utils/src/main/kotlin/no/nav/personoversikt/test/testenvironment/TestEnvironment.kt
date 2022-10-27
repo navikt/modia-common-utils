@@ -1,11 +1,14 @@
 package no.nav.personoversikt.test.testenvironment
 
-class TestEnvironment(private val testEnvironment: Map<String, String?>) {
+class TestEnvironment(private val testEnvironment: () -> Map<String, String?>) {
     private var originalEnvironment: Map<String, String?>? = null
 
+    constructor(testEnvironment: Map<String, String?>) : this({ testEnvironment })
+
     internal fun beforeTestExecution() {
-        originalEnvironment = testEnvironment.keys.associateWith(System::getProperty)
-        setAsEnvironment(testEnvironment)
+        val env = testEnvironment()
+        originalEnvironment = env.keys.associateWith(System::getProperty)
+        setAsEnvironment(env)
     }
 
     internal fun afterTestExecution() {
