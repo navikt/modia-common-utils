@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class TestEnvironmentLambdaTest {
+class TestEnvironmentTest {
     @Test
     internal fun `should setup environment`() {
-        TestEnvironmentRunner.runWithEnvironment(mapOf("key1" to "value1")) {
+        TestEnvironment.runWithEnvironment(mapOf("key1" to "value1")) {
             assertEquals("value1", System.getProperty("key1"))
         }
     }
