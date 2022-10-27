@@ -8,16 +8,16 @@ class TestEnvironmentRule(
     testEnvironment: Map<String, String?>
 ) : MethodRule {
 
-    val runner = TestEnvironment(testEnvironment)
+    val testEnvironment = TestEnvironment(testEnvironment)
 
     constructor(vararg pairs: Pair<String, String?>) : this(mapOf(*pairs))
 
     override fun apply(statement: Statement, method: FrameworkMethod, target: Any): Statement {
         return object : Statement() {
             override fun evaluate() {
-                runner.beforeTestEnvironmentRunner()
+                testEnvironment.beforeTestExecution()
                 statement.evaluate()
-                runner.afterTestEnvironmentRunner()
+                testEnvironment.afterTestExecution()
             }
         }
     }
