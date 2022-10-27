@@ -8,13 +8,13 @@ Oppsett for å sette opp miljøvariabler (`System.properties`) ved kjøring av t
 
 Før hver test settes properties, og etter hver test blir de satt tilbake til sine originale verdier før testen startet.
 
-Funksjonaliteten er tilgjengeliggjort vha `TestEnvironmentRunner.runWithEnvironment`. 
+Funksjonaliteten er tilgjengeliggjort vha `TestEnvironment.withEnvironment`. 
 Om det er properties som skal gjelde for alle testene kan man derimot bruke `TestEnvironmentRule` eller `TestEnvironmentExtension`.
 ```kotlin
 @Test
 fun dotest() {
     val env = mapOf("key" to "value", "more" to "other")
-    TestEnvironmentRunner.runWithEnvironment(env) {
+    TestEnvironment.withEnvironment(env) {
         val something = service.fetchData(System.getProperty("more"))
     }
 }
@@ -48,8 +48,6 @@ fun dotest() {
     val something = service.fetchData(System.getProperty("more"))
 }
 ```
-
-Alternativt kan man registere extensions vha `@ExtendWith` i Junit5, se [AnnotatedTestEnvironmentExtensionTest](src/test/kotlin/no/nav/personoversikt/test/testenvironment/AnnotatedTestEnvironmentExtensionTest.kt)
 
 ## Snapshot testing
 
