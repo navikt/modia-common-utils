@@ -11,6 +11,7 @@
         <module>ktor-utils</module>
         <module>test-utils</module>
         <module>typeanalyzer</module>
+        <module>kabac</module>
     </modules>
     <packaging>pom</packaging>
     <name>modia-common-utils</name>
