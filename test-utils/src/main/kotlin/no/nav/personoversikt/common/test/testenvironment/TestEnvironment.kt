@@ -1,4 +1,4 @@
-package no.nav.personoversikt.test.testenvironment
+package no.nav.personoversikt.common.test.testenvironment
 
 class TestEnvironment(private val testEnvironment: () -> Map<String, String?>) {
     private var originalEnvironment: Map<String, String?>? = null

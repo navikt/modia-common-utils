@@ -1,6 +1,6 @@
-package no.nav.personoversikt.test.snapshot.format
+package no.nav.personoversikt.common.test.snapshot.format
 
-import no.nav.personoversikt.test.snapshot.SnapshotRunner
+import no.nav.personoversikt.common.test.snapshot.SnapshotRunner
 
 object TextSnapshotFormat : SnapshotRunner.Fileformat {
     override val fileExtension: String = "txt"

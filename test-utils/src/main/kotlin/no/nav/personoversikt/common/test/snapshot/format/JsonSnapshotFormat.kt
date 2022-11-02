@@ -1,11 +1,11 @@
-package no.nav.personoversikt.test.snapshot.format
+package no.nav.personoversikt.common.test.snapshot.format
 
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator
-import no.nav.personoversikt.test.snapshot.SnapshotRunner
+import no.nav.personoversikt.common.test.snapshot.SnapshotRunner
 
 private class JsonFormat(private val mapper: ObjectMapper) : SnapshotRunner.Fileformat {
     override val fileExtension: String = "json"

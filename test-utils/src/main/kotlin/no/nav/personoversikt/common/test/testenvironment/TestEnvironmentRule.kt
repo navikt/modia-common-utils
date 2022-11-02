@@ -1,4 +1,4 @@
-package no.nav.personoversikt.test.testenvironment
+package no.nav.personoversikt.common.test.testenvironment
 
 import org.junit.rules.MethodRule
 import org.junit.runners.model.FrameworkMethod
