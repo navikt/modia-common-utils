@@ -14,8 +14,8 @@ import io.ktor.server.request.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import no.nav.personoversikt.common.crypto.Crypter
-import no.nav.personoversikt.utils.StringUtils.addPrefixIfMissing
-import no.nav.personoversikt.utils.StringUtils.removePrefix
+import no.nav.personoversikt.common.utils.StringUtils.addPrefixIfMissing
+import no.nav.personoversikt.common.utils.StringUtils.removePrefix
 import org.slf4j.LoggerFactory
 import java.net.URL
 

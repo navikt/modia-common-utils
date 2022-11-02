@@ -1,4 +1,4 @@
-package no.nav.personoversikt.utils
+package no.nav.personoversikt.common.utils
 
 import java.nio.file.Paths
 import kotlin.io.path.readText
@@ -8,7 +8,9 @@ object EnvUtils {
         return System.getProperty(name, System.getenv(name) ?: defaultValues[name])
     }
 
-    fun getRequiredConfig(name: String, defaultValues: Map<String, String?> = emptyMap()): String = checkNotNull(getConfig(name, defaultValues)) {
+    fun getRequiredConfig(name: String, defaultValues: Map<String, String?> = emptyMap()): String = checkNotNull(
+        getConfig(name, defaultValues)
+    ) {
         "Could not find property or environment variable for '$name'"
     }
 

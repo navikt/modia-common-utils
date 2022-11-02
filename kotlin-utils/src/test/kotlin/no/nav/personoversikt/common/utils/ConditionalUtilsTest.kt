@@ -1,6 +1,6 @@
-package no.nav.personoversikt.utils
+package no.nav.personoversikt.common.utils
 
-import no.nav.personoversikt.utils.ConditionalUtils.ifNotNull
+import no.nav.personoversikt.common.utils.ConditionalUtils.ifNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 

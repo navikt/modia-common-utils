@@ -1,10 +1,10 @@
-package no.nav.personoversikt.utils
+package no.nav.personoversikt.common.utils
 
-import no.nav.personoversikt.utils.StringUtils.addPrefixIfMissing
-import no.nav.personoversikt.utils.StringUtils.cutoff
-import no.nav.personoversikt.utils.StringUtils.indicesOf
-import no.nav.personoversikt.utils.StringUtils.isLetters
-import no.nav.personoversikt.utils.StringUtils.isNumeric
+import no.nav.personoversikt.common.utils.StringUtils.addPrefixIfMissing
+import no.nav.personoversikt.common.utils.StringUtils.cutoff
+import no.nav.personoversikt.common.utils.StringUtils.indicesOf
+import no.nav.personoversikt.common.utils.StringUtils.isLetters
+import no.nav.personoversikt.common.utils.StringUtils.isNumeric
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

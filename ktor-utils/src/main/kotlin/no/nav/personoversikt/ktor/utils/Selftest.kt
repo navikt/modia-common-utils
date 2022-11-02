@@ -4,7 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.personoversikt.utils.SelftestGenerator
+import no.nav.personoversikt.common.utils.SelftestGenerator
 
 object Selftest {
     class Config(
