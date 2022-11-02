@@ -1,4 +1,4 @@
-package no.nav.personoversikt.typeanalyzer
+package no.nav.personoversikt.common.typeanalyzer
 
 sealed class Capture(open var type: CaptureType)
 object UnknownCapture : Capture(CaptureType.UNKNOWN)
