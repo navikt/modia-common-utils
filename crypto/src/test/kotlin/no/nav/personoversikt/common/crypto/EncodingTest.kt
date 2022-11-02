@@ -1,4 +1,4 @@
-package no.nav.personoversikt.crypto
+package no.nav.personoversikt.common.crypto
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

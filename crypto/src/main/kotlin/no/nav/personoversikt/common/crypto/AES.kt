@@ -1,4 +1,4 @@
-package no.nav.personoversikt.crypto
+package no.nav.personoversikt.common.crypto
 
 import java.nio.ByteBuffer
 import java.security.SecureRandom

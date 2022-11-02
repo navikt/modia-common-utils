@@ -1,6 +1,6 @@
-package no.nav.personoversikt.crypto
+package no.nav.personoversikt.common.crypto
 
-import no.nav.personoversikt.crypto.Encoding.isBase64Encoded
+import no.nav.personoversikt.common.crypto.Encoding.isBase64Encoded
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

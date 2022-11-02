@@ -13,7 +13,7 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import no.nav.personoversikt.crypto.Crypter
+import no.nav.personoversikt.common.crypto.Crypter
 import no.nav.personoversikt.utils.StringUtils.addPrefixIfMissing
 import no.nav.personoversikt.utils.StringUtils.removePrefix
 import org.slf4j.LoggerFactory
