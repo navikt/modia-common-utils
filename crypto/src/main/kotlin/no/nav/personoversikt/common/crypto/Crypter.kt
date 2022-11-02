@@ -1,4 +1,4 @@
-package no.nav.personoversikt.crypto
+package no.nav.personoversikt.common.crypto
 
 class Crypter(secret: String) {
     private val password = secret.substring(secret.length / 2)
