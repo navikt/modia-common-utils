@@ -1,4 +1,4 @@
-package no.nav.personoversikt.typeanalyzer
+package no.nav.personoversikt.common.typeanalyzer
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.json.JsonMapper
