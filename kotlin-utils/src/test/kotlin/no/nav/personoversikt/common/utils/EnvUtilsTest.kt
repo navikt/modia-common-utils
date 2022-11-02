@@ -1,4 +1,4 @@
-package no.nav.personoversikt.utils
+package no.nav.personoversikt.common.utils
 
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*

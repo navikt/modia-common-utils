@@ -1,4 +1,4 @@
-package no.nav.personoversikt.utils
+package no.nav.personoversikt.common.utils
 
 object ConditionalUtils {
     inline fun <T1 : Any, R : Any> ifNotNull(p1: T1?, block: (T1) -> R?): R? {

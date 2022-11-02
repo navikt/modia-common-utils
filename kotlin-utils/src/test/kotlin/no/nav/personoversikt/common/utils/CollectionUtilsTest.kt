@@ -1,6 +1,6 @@
-package no.nav.personoversikt.utils
+package no.nav.personoversikt.common.utils
 
-import no.nav.personoversikt.utils.CollectionUtils.isNotNullOrEmpty
+import no.nav.personoversikt.common.utils.CollectionUtils.isNotNullOrEmpty
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

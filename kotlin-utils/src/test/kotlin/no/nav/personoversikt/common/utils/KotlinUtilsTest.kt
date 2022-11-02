@@ -1,10 +1,10 @@
-package no.nav.personoversikt.utils
+package no.nav.personoversikt.common.utils
 
-import no.nav.personoversikt.utils.KotlinUtils.and
-import no.nav.personoversikt.utils.KotlinUtils.inRange
-import no.nav.personoversikt.utils.KotlinUtils.inRangeInclusive
-import no.nav.personoversikt.utils.KotlinUtils.or
-import no.nav.personoversikt.utils.KotlinUtils.xor
+import no.nav.personoversikt.common.utils.KotlinUtils.and
+import no.nav.personoversikt.common.utils.KotlinUtils.inRange
+import no.nav.personoversikt.common.utils.KotlinUtils.inRangeInclusive
+import no.nav.personoversikt.common.utils.KotlinUtils.or
+import no.nav.personoversikt.common.utils.KotlinUtils.xor
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

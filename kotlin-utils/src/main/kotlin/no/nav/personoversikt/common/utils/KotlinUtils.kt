@@ -1,4 +1,4 @@
-package no.nav.personoversikt.utils
+package no.nav.personoversikt.common.utils
 
 object KotlinUtils {
     infix fun Int.inRange(range: Pair<Int, Int>): Boolean = this >= range.first && this < range.second
