@@ -1,4 +1,4 @@
-package no.nav.personoversikt.kabac
+package no.nav.personoversikt.common.kabac
 
 sealed class Decision(var type: Type) {
     interface DenyCause

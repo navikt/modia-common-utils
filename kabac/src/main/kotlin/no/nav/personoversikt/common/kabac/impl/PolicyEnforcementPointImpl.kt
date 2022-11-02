@@ -1,9 +1,9 @@
-package no.nav.personoversikt.kabac.impl
+package no.nav.personoversikt.common.kabac.impl
 
-import no.nav.personoversikt.kabac.AttributeValue
-import no.nav.personoversikt.kabac.CombiningAlgorithm
-import no.nav.personoversikt.kabac.Decision
-import no.nav.personoversikt.kabac.Kabac
+import no.nav.personoversikt.common.kabac.AttributeValue
+import no.nav.personoversikt.common.kabac.CombiningAlgorithm
+import no.nav.personoversikt.common.kabac.Decision
+import no.nav.personoversikt.common.kabac.Kabac
 
 class PolicyEnforcementPointImpl(
     override val bias: Decision.Type = Decision.Type.DENY,

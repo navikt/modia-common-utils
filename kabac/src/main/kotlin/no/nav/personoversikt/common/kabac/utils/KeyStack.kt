@@ -1,6 +1,6 @@
-package no.nav.personoversikt.kabac.utils
+package no.nav.personoversikt.common.kabac.utils
 
-import no.nav.personoversikt.kabac.KabacException
+import no.nav.personoversikt.common.kabac.KabacException
 
 internal class KeyStack {
     private val stack = LinkedHashSet<Key<*>>()

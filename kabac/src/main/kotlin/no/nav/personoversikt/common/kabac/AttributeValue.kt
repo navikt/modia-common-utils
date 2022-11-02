@@ -1,6 +1,6 @@
-package no.nav.personoversikt.kabac
+package no.nav.personoversikt.common.kabac
 
-import no.nav.personoversikt.kabac.utils.Key
+import no.nav.personoversikt.common.kabac.utils.Key
 
 data class AttributeValue<TValue>(
     override val key: Key<TValue>,

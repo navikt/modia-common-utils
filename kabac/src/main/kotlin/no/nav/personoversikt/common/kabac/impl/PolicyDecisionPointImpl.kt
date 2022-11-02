@@ -1,8 +1,8 @@
-package no.nav.personoversikt.kabac.impl
+package no.nav.personoversikt.common.kabac.impl
 
-import no.nav.personoversikt.kabac.AttributeValue
-import no.nav.personoversikt.kabac.Kabac
-import no.nav.personoversikt.kabac.utils.Key
+import no.nav.personoversikt.common.kabac.AttributeValue
+import no.nav.personoversikt.common.kabac.Kabac
+import no.nav.personoversikt.common.kabac.utils.Key
 
 class PolicyDecisionPointImpl : Kabac.PolicyDecisionPoint {
     private val providerRegister = mutableMapOf<Key<*>, Kabac.PolicyInformationPoint<*>>()

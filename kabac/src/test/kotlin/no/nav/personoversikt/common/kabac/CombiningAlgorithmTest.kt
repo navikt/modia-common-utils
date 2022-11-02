@@ -1,7 +1,7 @@
-package no.nav.personoversikt.kabac
+package no.nav.personoversikt.common.kabac
 
-import no.nav.personoversikt.kabac.KabacTestUtils.createTestPolicy
-import no.nav.personoversikt.kabac.impl.EvaluationContextImpl
+import no.nav.personoversikt.common.kabac.KabacTestUtils.createTestPolicy
+import no.nav.personoversikt.common.kabac.impl.EvaluationContextImpl
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Named
 import org.junit.jupiter.params.ParameterizedTest

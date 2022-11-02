@@ -1,4 +1,4 @@
-package no.nav.personoversikt.kabac
+package no.nav.personoversikt.common.kabac
 
 object KabacException {
     class MissingPolicyInformationPointException(message: String) : IllegalStateException(message)

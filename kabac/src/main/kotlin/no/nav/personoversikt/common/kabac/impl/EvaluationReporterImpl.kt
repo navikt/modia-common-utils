@@ -1,6 +1,6 @@
-package no.nav.personoversikt.kabac.impl
+package no.nav.personoversikt.common.kabac.impl
 
-import no.nav.personoversikt.kabac.Kabac
+import no.nav.personoversikt.common.kabac.Kabac
 
 class EvaluationReporterImpl : Kabac.EvaluationReporter {
     private val sb = StringBuilder()

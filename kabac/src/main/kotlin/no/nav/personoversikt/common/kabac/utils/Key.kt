@@ -1,6 +1,6 @@
-package no.nav.personoversikt.kabac.utils
+package no.nav.personoversikt.common.kabac.utils
 
-import no.nav.personoversikt.kabac.AttributeValue
+import no.nav.personoversikt.common.kabac.AttributeValue
 
 class Key<TYPE>(val name: String) {
     init {

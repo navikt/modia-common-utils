@@ -1,9 +1,9 @@
-package no.nav.personoversikt.kabac.impl
+package no.nav.personoversikt.common.kabac.impl
 
-import no.nav.personoversikt.kabac.Kabac
-import no.nav.personoversikt.kabac.KabacException
-import no.nav.personoversikt.kabac.utils.Key
-import no.nav.personoversikt.kabac.utils.KeyStack
+import no.nav.personoversikt.common.kabac.Kabac
+import no.nav.personoversikt.common.kabac.KabacException
+import no.nav.personoversikt.common.kabac.utils.Key
+import no.nav.personoversikt.common.kabac.utils.KeyStack
 
 class EvaluationContextImpl(
     providers: List<Kabac.PolicyInformationPoint<*>>
