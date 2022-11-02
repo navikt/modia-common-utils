@@ -1,7 +1,7 @@
-package no.nav.personoversikt.test.snapshot
+package no.nav.personoversikt.common.test.snapshot
 
-import no.nav.personoversikt.test.snapshot.format.JsonSnapshotFormat
-import no.nav.personoversikt.test.snapshot.format.TextSnapshotFormat
+import no.nav.personoversikt.common.test.snapshot.format.JsonSnapshotFormat
+import no.nav.personoversikt.common.test.snapshot.format.TextSnapshotFormat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.UUID

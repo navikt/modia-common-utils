@@ -1,8 +1,8 @@
 package no.nav.personoversikt.typeanalyzer
 
-import no.nav.personoversikt.test.snapshot.SnapshotExtension
-import no.nav.personoversikt.test.snapshot.format.JsonSnapshotFormat
-import no.nav.personoversikt.test.snapshot.format.TextSnapshotFormat
+import no.nav.personoversikt.common.test.snapshot.SnapshotExtension
+import no.nav.personoversikt.common.test.snapshot.format.JsonSnapshotFormat
+import no.nav.personoversikt.common.test.snapshot.format.TextSnapshotFormat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension

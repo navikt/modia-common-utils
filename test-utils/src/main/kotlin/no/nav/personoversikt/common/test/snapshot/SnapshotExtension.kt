@@ -1,6 +1,6 @@
-package no.nav.personoversikt.test.snapshot
+package no.nav.personoversikt.common.test.snapshot
 
-import no.nav.personoversikt.test.snapshot.format.JsonSnapshotFormat
+import no.nav.personoversikt.common.test.snapshot.format.JsonSnapshotFormat
 import org.junit.jupiter.api.extension.*
 
 open class SnapshotExtension(

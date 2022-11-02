@@ -1,4 +1,4 @@
-package no.nav.personoversikt.test.snapshot
+package no.nav.personoversikt.common.test.snapshot
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
