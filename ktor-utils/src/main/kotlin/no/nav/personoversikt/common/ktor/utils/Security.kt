@@ -1,4 +1,4 @@
-package no.nav.personoversikt.ktor.utils
+package no.nav.personoversikt.common.ktor.utils
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
