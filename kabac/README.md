@@ -9,9 +9,9 @@ Pakke for å bygge opp komplekse tilgangskontroll-regler basert på attributter 
 - **Policy information point (PIP):** En klasse som beskriver hvordan et informasjon element kan hentes ut.   
   Man lager typisk sett flere av disse i en applikasjon, f.eks for å hente ut brukers id og roller.  
 - **Policy decision point (PDP):** En klasse ansvarlig for å holde orden på hvilke *PIPer* som finnes, og etablering av evaluerings konteksten.  
-  Det er uvanlig at man bruker noe annet enn standarden `no.nav.personoversikt.kabac.impl.PolicyDecisionPointImpl`.
+  Det er uvanlig at man bruker noe annet enn standarden `no.nav.personoversikt.common.PolicyDecisionPointImpl`.
 - **Policy enforcement point (PEP):** En klasse ansvarlig for å evaluere en policy gitt en evaluerings kontekst, og om ønskelig få en rapport av utførelsen generert.  
-  Det er uvanlig at man bruker noe annet enn standarden `no.nav.personoversikt.kabac.impl.PolicyEnforcementPointImpl`.
+  Det er uvanlig at man bruker noe annet enn standarden `no.nav.personoversikt.common.PolicyEnforcementPointImpl`.
 
 **Eksempel PIP**
 ```kotlin

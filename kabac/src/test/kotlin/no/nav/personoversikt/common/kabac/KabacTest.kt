@@ -1,9 +1,9 @@
-package no.nav.personoversikt.kabac
+package no.nav.personoversikt.common.kabac
 
-import no.nav.personoversikt.kabac.KabacTestUtils.createTestPolicy
-import no.nav.personoversikt.kabac.impl.PolicyDecisionPointImpl
-import no.nav.personoversikt.kabac.impl.PolicyEnforcementPointImpl
-import no.nav.personoversikt.kabac.utils.Key
+import no.nav.personoversikt.common.kabac.KabacTestUtils.createTestPolicy
+import no.nav.personoversikt.common.kabac.impl.PolicyDecisionPointImpl
+import no.nav.personoversikt.common.kabac.impl.PolicyEnforcementPointImpl
+import no.nav.personoversikt.common.kabac.utils.Key
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

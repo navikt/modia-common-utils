@@ -1,6 +1,6 @@
-package no.nav.personoversikt.kabac
+package no.nav.personoversikt.common.kabac
 
-import no.nav.personoversikt.kabac.utils.Key
+import no.nav.personoversikt.common.kabac.utils.Key
 
 interface CombiningAlgorithm {
     fun combine(policies: List<Kabac.Policy>): Kabac.Policy
