@@ -1,4 +1,4 @@
-package no.nav.personoversikt.ktor.utils
+package no.nav.personoversikt.common.ktor.utils
 
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

@@ -1,4 +1,4 @@
-package no.nav.personoversikt.ktor.utils
+package no.nav.personoversikt.common.ktor.utils
 
 import io.ktor.server.application.*
 import io.ktor.server.metrics.micrometer.*
@@ -39,7 +39,7 @@ object Metrics {
         }
     }
     val Registry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-    val Plugin = createApplicationPlugin("Metrics", ::Config) {
+    val Plugin = createApplicationPlugin("Metrics", Metrics::Config) {
         val config = pluginConfig
         with(application) {
             install(MicrometerMetrics) {
