@@ -11,6 +11,8 @@
         <module>ktor-utils</module>
         <module>test-utils</module>
         <module>typeanalyzer</module>
+        <module>kabac</module>
+        <module>logging</module>
     </modules>
     <packaging>pom</packaging>
     <name>modia-common-utils</name>
@@ -21,7 +23,9 @@
         <kotlinx.serialization.version>1.4.0-RC</kotlinx.serialization.version>
         <java.version>11</java.version>
         <prometheus.version>1.9.1</prometheus.version>
+        <logback.version>1.2.11</logback.version>
         <slf4j.version>1.7.36</slf4j.version>
+        <logstash.version>7.2</logstash.version>
         <jackson.version>2.13.4</jackson.version>
         <junit.version>5.8.2</junit.version>
         <mockk.version>1.12.4</mockk.version>
@@ -98,6 +102,11 @@
                 <version>${prometheus.version}</version>
             </dependency>
             <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
@@ -107,6 +116,12 @@
                 <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>org.jetbrains.kotlinx</groupId>
