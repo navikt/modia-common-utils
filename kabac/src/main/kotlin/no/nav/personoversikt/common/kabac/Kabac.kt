@@ -9,6 +9,7 @@ object Kabac {
     interface EvaluationContext : EvaluationReporter {
         fun <TValue> getValue(attributeKey: AttributeKey<TValue>): TValue
         fun <TValue> getValue(key: Key<TValue>): TValue
+        operator fun plus(other: EvaluationContext): EvaluationContext
     }
 
     interface EvaluationReporter {

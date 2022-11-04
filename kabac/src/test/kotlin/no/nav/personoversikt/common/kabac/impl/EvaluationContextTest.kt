@@ -149,6 +149,26 @@ internal class EvaluationContextTest {
         assertEquals("OK", result)
     }
 
+    @Test
+    internal fun `should merge contexts`() {
+        val policyEnforcementPointImpl = PolicyEnforcementPointImpl(policyDecisionPoint = PolicyDecisionPointImpl())
+        val firstKey = Key<String>("first")
+        val firstValue = AttributeValue(firstKey, "first-value")
+        val secondKey = Key<String>("second")
+        val secondValue = AttributeValue(secondKey, "second-value")
+
+        val firstCtx = policyEnforcementPointImpl.createEvaluationContext(listOf(firstValue)).also {
+            it.getValue(firstKey)
+        }
+        val secondCtx = policyEnforcementPointImpl.createEvaluationContext(listOf(secondValue))
+
+        val mergedCtx = firstCtx + secondCtx
+        mergedCtx as EvaluationContextImpl
+
+        assertEquals(1, mergedCtx.cache.size)
+        assertEquals(2, mergedCtx.register.size)
+    }
+
     private fun <T> createCyclicProvider(key: Key<T>, dependent: Key<T>) = object : Kabac.PolicyInformationPoint<T> {
         override val key: Key<T> = key
         override fun provide(ctx: Kabac.EvaluationContext): T {
