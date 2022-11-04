@@ -1,6 +1,5 @@
 package no.nav.personoversikt.common.logging
 
-import no.nav.personoversikt.common.logging.TjenestekallLogg.LogType
 import no.nav.personoversikt.common.test.logassert.LogAsserts.Companion.captureLogs
 import org.junit.jupiter.api.Test
 import org.slf4j.event.Level
@@ -39,7 +38,7 @@ internal class TjenestekallLoggTest {
     @Test
     internal fun `should support typed logs`() {
         val capture = TjenestekallLogg.raw.captureLogs {
-            TjenestekallLogg.withLogType(LogType("TestLogger")).warn(
+            TjenestekallLogg.withLogType("TestLogger").warn(
                 header = "Header",
                 fields = mapOf("field_key" to "field_value"),
                 tags = mapOf("tag_key" to "tag_value"),
