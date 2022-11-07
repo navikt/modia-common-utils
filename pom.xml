@@ -13,6 +13,7 @@
         <module>typeanalyzer</module>
         <module>kabac</module>
         <module>logging</module>
+        <module>science</module>
     </modules>
     <packaging>pom</packaging>
     <name>modia-common-utils</name>
