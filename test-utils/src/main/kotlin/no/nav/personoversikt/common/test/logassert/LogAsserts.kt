@@ -6,12 +6,17 @@ import com.fasterxml.jackson.core.util.JsonGeneratorDelegate
 import net.logstash.logback.argument.StructuredArgument
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import ch.qos.logback.classic.Logger as LogbackLogger
 import org.slf4j.Logger as Logger
 
 class LogAsserts(private val appender: ListAppender<ILoggingEvent>) {
     companion object {
+        fun captureLogs(block: () -> Unit): LogAsserts {
+            return LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).captureLogs(block)
+        }
+
         fun Logger.captureLogs(block: () -> Unit): LogAsserts {
             this as LogbackLogger
             val appender = ListAppender<ILoggingEvent>().apply { start() }
