@@ -1,5 +1,6 @@
-package no.nav.personoversikt.common.science
+package no.nav.personoversikt.common.science.switcher
 
+import no.nav.personoversikt.common.science.Rate
 import org.slf4j.LoggerFactory
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.InvocationTargetException
@@ -8,21 +9,18 @@ import java.lang.reflect.Proxy
 
 object ProxySwitcher {
     private val log = LoggerFactory.getLogger(ProxySwitcher::class.java)
-    fun interface Switch {
-        fun isEnabled(): Boolean
-    }
 
     @PublishedApi
     internal class ProxyHandler<T : Any>(
         private val name: String,
-        private val switch: Switch,
+        private val switch: Rate,
         private val ifEnabled: T,
         private val ifDisabled: T,
     ) : InvocationHandler {
         override fun invoke(proxy: Any, method: Method, args: Array<out Any>?): Any {
             val nullsafeArgs = args ?: arrayOfNulls<Any>(0)
             return try {
-                if (switch.isEnabled()) {
+                if (switch.evaluate()) {
                     log.warn("[ProxySwitcher] $name is enabled")
                     method.invoke(ifEnabled, *nullsafeArgs)
                 } else {
@@ -35,7 +33,7 @@ object ProxySwitcher {
     }
 
     inline fun <reified T : Any> createSwitcher(
-        switch: Switch,
+        switch: Rate,
         ifEnabled: T,
         ifDisabled: T,
     ): T {

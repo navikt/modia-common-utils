@@ -1,7 +1,7 @@
-package no.nav.personoversikt.common.science
+package no.nav.personoversikt.common.science.switcher
 
-import no.nav.personoversikt.common.test.logassert.LogAsserts.Companion.captureLogs
-import org.junit.jupiter.api.Assertions.*
+import no.nav.personoversikt.common.test.logassert.LogAsserts
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.event.Level
@@ -19,8 +19,8 @@ internal class ProxySwitcherTest {
             ifDisabled = DummyService { "From disabled" },
         )
 
-        captureLogs {
-            assertEquals("From enabled", service.getData())
+        LogAsserts.captureLogs {
+            Assertions.assertEquals("From enabled", service.getData())
         }
             .hasSize(1)
             .logline {
@@ -37,8 +37,8 @@ internal class ProxySwitcherTest {
             ifDisabled = DummyService { "From disabled" },
         )
 
-        captureLogs {
-            assertEquals("From disabled", service.getData())
+        LogAsserts.captureLogs {
+            Assertions.assertEquals("From disabled", service.getData())
         }.hasSize(0)
     }
 
@@ -53,6 +53,6 @@ internal class ProxySwitcherTest {
         val exception = assertThrows<IllegalStateException> {
             service.getData()
         }
-        assertEquals("From enabled", exception.message)
+        Assertions.assertEquals("From enabled", exception.message)
     }
 }
