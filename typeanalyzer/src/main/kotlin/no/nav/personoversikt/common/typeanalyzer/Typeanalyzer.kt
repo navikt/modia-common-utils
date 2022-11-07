@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.slf4j.LoggerFactory
 
-class Typeanalyzer {
+open class Typeanalyzer {
     private val log = LoggerFactory.getLogger(Typeanalyzer::class.java)
     private val objectMapper = JsonMapper.builder()
         .findAndAddModules()
@@ -19,14 +19,17 @@ class Typeanalyzer {
 
     private var previousCapture: Capture? = null
     private var previousJsonNode: JsonNode? = null
+    val stats = CaptureStats()
 
-    fun capture(value: Any?): Capture? {
+    open fun capture(value: Any?): Capture? {
         objectMapper
             .runCatching { readTree(objectMapper.writeValueAsBytes(value)) }
             .mapCatching { jsonNode ->
                 try {
                     val capture = jsonNode.toCapture()
-                    previousCapture = previousCapture?.reconcile(capture) ?: capture
+                    val reconciledCapture = previousCapture?.reconcile(capture) ?: capture
+                    stats.capture(changed = reconciledCapture != previousCapture)
+                    previousCapture = reconciledCapture
                 } catch (err: Throwable) {
                     log.error(
                         """
