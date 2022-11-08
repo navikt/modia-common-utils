@@ -9,10 +9,10 @@ import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
-import org.slf4j.LoggerFactory
+import no.nav.personoversikt.common.logging.TjenestekallLogg
 
 open class Typeanalyzer {
-    private val log = LoggerFactory.getLogger(Typeanalyzer::class.java)
+    private val log = TjenestekallLogg.withLogType("typeanalyzer")
     private val objectMapper = JsonMapper.builder()
         .findAndAddModules()
         .build()
@@ -32,12 +32,13 @@ open class Typeanalyzer {
                     previousCapture = reconciledCapture
                 } catch (err: Throwable) {
                     log.error(
-                        """
-                        Reconciliation failed.
-                        Previous: $previousJsonNode
-                        Capture: $jsonNode
-                        """.trimIndent(),
-                        err
+                        "Reconciliation failed",
+                        mapOf(
+                            "exception" to err.message,
+                            "previous" to previousCapture,
+                            "capture" to jsonNode
+                        ),
+                        throwable = err
                     )
                     throw err
                 }
