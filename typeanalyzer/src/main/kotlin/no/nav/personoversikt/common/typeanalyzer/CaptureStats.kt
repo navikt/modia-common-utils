@@ -7,6 +7,11 @@ class CaptureStats {
     var countSizeLastChange: Int = 0
         private set
 
+    var errors: Int = 0
+        private set
+
+    var lastException: Throwable? = null
+
     val confidence: Double
         get() = countSizeLastChange.toDouble() / count
 
@@ -17,5 +22,10 @@ class CaptureStats {
         } else {
             countSizeLastChange++
         }
+    }
+
+    fun exception(exception: Throwable) {
+        errors++
+        lastException = exception
     }
 }

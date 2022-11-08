@@ -29,19 +29,21 @@ open class Typeanalyzer {
                     val reconciledCapture = previousCapture?.reconcile(capture) ?: capture
                     stats.capture(changed = reconciledCapture != previousCapture)
                     previousCapture = reconciledCapture
-                } catch (err: Throwable) {
+                } catch (throwable: Throwable) {
                     log.error(
                         "Reconciliation failed",
                         mapOf(
-                            "exception" to err.message,
+                            "exception" to throwable.message,
                             "previousCapture" to previousCapture,
                             "capture" to capture
                         ),
-                        throwable = err
+                        throwable = throwable
                     )
+                    stats.exception(throwable)
                 }
             }.onFailure {
                 log.error("Reconciliation failed", mapOf("exception" to it.message), throwable = it)
+                stats.exception(it)
             }
 
         return previousCapture
