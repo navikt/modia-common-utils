@@ -18,15 +18,14 @@ open class Typeanalyzer {
         .build()
 
     private var previousCapture: Capture? = null
-    private var previousJsonNode: JsonNode? = null
     val stats = CaptureStats()
 
     open fun capture(value: Any?): Capture? {
         objectMapper
             .runCatching { readTree(objectMapper.writeValueAsBytes(value)) }
-            .mapCatching { jsonNode ->
+            .mapCatching { jsonNode -> jsonNode.toCapture() }
+            .mapCatching { capture ->
                 try {
-                    val capture = jsonNode.toCapture()
                     val reconciledCapture = previousCapture?.reconcile(capture) ?: capture
                     stats.capture(changed = reconciledCapture != previousCapture)
                     previousCapture = reconciledCapture
@@ -35,14 +34,14 @@ open class Typeanalyzer {
                         "Reconciliation failed",
                         mapOf(
                             "exception" to err.message,
-                            "previous" to previousCapture,
-                            "capture" to jsonNode
+                            "previousCapture" to previousCapture,
+                            "capture" to capture
                         ),
                         throwable = err
                     )
-                    throw err
                 }
-                previousJsonNode = jsonNode
+            }.onFailure {
+                log.error("Reconciliation failed", mapOf("exception" to it.message), throwable = it)
             }
 
         return previousCapture
