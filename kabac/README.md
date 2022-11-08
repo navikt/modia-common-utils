@@ -117,7 +117,7 @@ Ved å inkludere `test-jar` til kabac-modulen får man tilgang til `KabacTestUti
 
 ```xml
 <dependency>
-    <groupId>no.nav.personoversikt</groupId>
+    <groupId>com.github.navikt.modia-common-utils</groupId>
     <artifactId>kabac</artifactId>
     <version>????</version>
     <type>test-jar</type>

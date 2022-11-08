@@ -11,3 +11,4 @@ mvn -B versions:commit
 
 echo "Running release"
 mvn -B --settings .github/maven-settings.xml deploy -Dmaven.wagon.http.pool=false
+git push --tags

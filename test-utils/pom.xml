@@ -6,8 +6,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>com.github.navikt.modia-common-utils</groupId>
         <artifactId>modia-common-utils</artifactId>
-        <groupId>no.nav.personoversikt</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 

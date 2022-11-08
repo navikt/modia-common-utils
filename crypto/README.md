@@ -6,7 +6,7 @@ Felleskomponent for krypering/dekryptering vha AES/GCM.
 ## Ta ibruk:
 ```xml
 <dependency>
-    <groupId>no.nav.personoversikt</groupId>
+    <groupId>com.github.navikt.modia-common-utils</groupId>
     <artifactId>crypto</artifactId>
     <version>???</version>
 </dependency>
