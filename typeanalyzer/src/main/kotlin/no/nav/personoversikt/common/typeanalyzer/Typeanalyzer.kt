@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import no.nav.personoversikt.common.logging.Logging
 import org.slf4j.LoggerFactory
 
 open class Typeanalyzer {
@@ -31,7 +32,7 @@ open class Typeanalyzer {
                     stats.capture(changed = reconciledCapture != previousCapture)
                     previousCapture = reconciledCapture
                 } catch (err: Throwable) {
-                    log.error(
+                    Logging.secureLog.error(
                         """
                         Reconciliation failed.
                         Previous: $previousJsonNode
