@@ -1,17 +1,10 @@
 package no.nav.personoversikt.common.typeanalyzer
 
-import no.nav.personoversikt.common.test.snapshot.SnapshotExtension
-import no.nav.personoversikt.common.test.snapshot.format.TextSnapshotFormat
 import no.nav.personoversikt.common.typeanalyzer.TypeanalyzerTest.CaptureAsserter.Companion.assertCapture
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class TypeanalyzerTest {
-    @JvmField
-    @RegisterExtension
-    val textSnapshot = SnapshotExtension(format = TextSnapshotFormat)
-
     @Test
     internal fun `should be able to handle primitive values`() {
         assertCapture(Typeanalyzer().capture(null))
@@ -152,6 +145,28 @@ internal class TypeanalyzerTest {
     }
 
     @Test
+    internal fun `should ignore unknown types when list is already typed`() {
+        val analyzer = Typeanalyzer()
+        assertCapture(analyzer.capture(listOf("test")))
+            .hasType<ListCapture>()
+            .assertList(listNullable = false, listElementNullable = false)
+            .assert {
+                assertCapture(it.value.subtype)
+                    .hasType<PrimitiveCapture>()
+                    .assertPrimitive(CaptureType.TEXT, false)
+            }
+
+        assertCapture(analyzer.capture(emptyList<String>()))
+            .hasType<ListCapture>()
+            .assertList(listNullable = false, listElementNullable = false)
+            .assert {
+                assertCapture(it.value.subtype)
+                    .hasType<PrimitiveCapture>()
+                    .assertPrimitive(CaptureType.TEXT, false)
+            }
+    }
+
+    @Test
     internal fun `should specify type in objects for null values`() {
         val analyzer = Typeanalyzer()
         assertCapture(analyzer.capture(mapOf("key" to null)))
@@ -180,6 +195,26 @@ internal class TypeanalyzerTest {
             }
 
         assertCapture(analyzer.capture(mapOf("key" to "text")))
+            .hasType<ObjectCapture>()
+            .assert {
+                assertCapture(it.value.getField("key"))
+                    .hasType<PrimitiveCapture>()
+                    .assertPrimitive(CaptureType.TEXT, nullable = true)
+            }
+    }
+
+    @Test
+    internal fun `should ignore unknown types when object is already typed`() {
+        val analyzer = Typeanalyzer()
+        assertCapture(analyzer.capture(mapOf("key" to "text")))
+            .hasType<ObjectCapture>()
+            .assert {
+                assertCapture(it.value.getField("key"))
+                    .hasType<PrimitiveCapture>()
+                    .assertPrimitive(CaptureType.TEXT, nullable = false)
+            }
+
+        assertCapture(analyzer.capture(emptyMap<String, Any>()))
             .hasType<ObjectCapture>()
             .assert {
                 assertCapture(it.value.getField("key"))

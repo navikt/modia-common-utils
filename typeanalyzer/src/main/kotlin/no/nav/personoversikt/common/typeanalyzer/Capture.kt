@@ -14,6 +14,7 @@ fun Capture.reconcile(other: Capture): Capture {
     return if (this.type != other.type) {
         when {
             this == UnknownCapture -> other
+            other == UnknownCapture -> this
             this == NullCapture && other is PrimitiveCapture -> other.copy(nullable = true)
             this == NullCapture && other is ListCapture -> other.copy(nullable = true)
             this == NullCapture && other is ObjectCapture -> other.copy(nullable = true)
@@ -24,7 +25,7 @@ fun Capture.reconcile(other: Capture): Capture {
                 """
                     Type mismatch, and could not reconcile typoes. Expected type ${this.type}, but got ${other.type}
                     Base: $this
-                    Base: $other
+                    Other: $other
                 """.trimIndent()
             )
         }
