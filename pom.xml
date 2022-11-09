@@ -13,6 +13,7 @@
         <module>typeanalyzer</module>
         <module>kabac</module>
         <module>logging</module>
+        <module>science</module>
     </modules>
     <packaging>pom</packaging>
     <name>modia-common-utils</name>
@@ -101,6 +102,12 @@
                 <artifactId>micrometer-registry-prometheus</artifactId>
                 <version>${prometheus.version}</version>
             </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>4.0.1</version>
+            </dependency>
+
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
