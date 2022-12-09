@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>com.github.navikt.modia-common-utils</groupId>
         <artifactId>modia-common-utils</artifactId>
-        <groupId>no.nav.personoversikt</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -32,7 +32,7 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>no.nav.personoversikt</groupId>
+            <groupId>com.github.navikt.modia-common-utils</groupId>
             <artifactId>logging</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -53,7 +53,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>no.nav.personoversikt</groupId>
+            <groupId>com.github.navikt.modia-common-utils</groupId>
             <artifactId>test-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>test</scope>
