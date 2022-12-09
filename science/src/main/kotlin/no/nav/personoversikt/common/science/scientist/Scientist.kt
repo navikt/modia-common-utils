@@ -17,8 +17,9 @@ object Scientist {
     data class Config(
         val name: String,
         val rate: Rate,
+        val threadSwappingFn: (() -> Any?) -> (() -> Any?) = { it },
         val reporter: Reporter = defaultReporter,
-        val logAndCompareValues: Boolean = true
+        val logAndCompareValues: Boolean = true,
     )
 
     data class Result<T>(
