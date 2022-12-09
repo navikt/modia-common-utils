@@ -1,6 +1,9 @@
 package no.nav.personoversikt.common.science.scientist
 
 import no.nav.personoversikt.common.science.Rate
+import no.nav.personoversikt.common.utils.KotlinUtils.plusminus
+import no.nav.personoversikt.common.utils.makeTransferable
+import no.nav.personoversikt.common.utils.withValue
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -13,7 +16,7 @@ internal class ScientistTest {
             Scientist.Config(
                 name = "DummyExperiment",
                 rate = { true },
-                { header, fields, tags, _ ->
+                reporter = { header, fields, tags, _ ->
                     assertTrue(header.startsWith("[SCIENCE] DummyExperiment"))
                 }
             )
@@ -220,6 +223,27 @@ internal class ScientistTest {
     }
 
     @Test
+    fun `experiment should utilize threadSwappingFn to make threadlocals`() {
+        threadlocal.withValue("main") {
+            Scientist.createExperiment<String>(
+                Scientist.Config(
+                    name = "DummyExperiment",
+                    rate = { true },
+                    reporter = { _, fields, _, _ ->
+                        assertMapContains("control", "\"main\"", fields)
+                        assertMapContains("experiment", "\"main\"", fields)
+                    },
+                    threadSwappingFn = threadlocal::makeTransferable
+                )
+            ).run(
+                control = { threadlocal.get() },
+                experiment = { threadlocal.get() },
+            )
+        }
+    }
+    private val threadlocal = ThreadLocal<String>()
+
+    @Test
     internal fun `experiment should report even if control throws exception`() {
         assertThrows<IllegalStateException> {
             Scientist.createExperiment<String>(
@@ -245,6 +269,4 @@ internal class ScientistTest {
     private fun assertWithinRange(range: IntRange, value: Int) {
         assertTrue(range.contains(value), "$range did not contain $value")
     }
-
-    private infix fun Int.plusminus(offset: Int): IntRange = (this - offset)..(this + offset)
 }
