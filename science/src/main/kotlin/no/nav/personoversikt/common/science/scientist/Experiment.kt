@@ -2,7 +2,7 @@ package no.nav.personoversikt.common.science.scientist
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.personoversikt.common.science.Rate
-import java.util.concurrent.CompletableFuture
+import no.nav.personoversikt.common.utils.ConcurrencyUtils.inParallel
 
 class Experiment<T> internal constructor(private val config: Scientist.Config) {
     fun run(
@@ -27,15 +27,17 @@ class Experiment<T> internal constructor(private val config: Scientist.Config) {
         }
 
         val markers = Scientist.Markers()
+        val controlSwappable = config.threadSwappingFn(control) as () -> T
+        val experimentSwappable = config.threadSwappingFn(experiment)
         val (controlResult, experimentResult) = inParallel(
             first = {
                 measureTimeInMillies {
-                    runCatching(control)
+                    runCatching(controlSwappable)
                 }
             },
             second = {
                 measureTimeInMillies {
-                    runCatching(experiment)
+                    runCatching(experimentSwappable)
                 }
             }
         )
@@ -78,15 +80,6 @@ class Experiment<T> internal constructor(private val config: Scientist.Config) {
     }
 
     companion object {
-        fun <S, T> inParallel(first: () -> S, second: () -> T): Pair<S, T> {
-            val firstTask = CompletableFuture.supplyAsync(first)
-            val secondTask = CompletableFuture.supplyAsync(second)
-
-            CompletableFuture.allOf(firstTask, secondTask).get()
-
-            return Pair(firstTask.get(), secondTask.get())
-        }
-
         private fun compareAndSerialize(control: Any?, experiment: Any?): Triple<Boolean, String, String> {
             val (controlJson, controlTree) = process(control)
             val (experimentJson, experimentTree) = process(experiment)
