@@ -32,6 +32,8 @@ internal class SelftestTest {
             content = """
                     Appname: testapp
                     Version: 1.0.0
+                    
+                    Status:
             """.trimIndent()
         )
     }
@@ -58,6 +60,8 @@ internal class SelftestTest {
             content = """
                     Appname: testapp
                     Version: 1.0.0
+                    
+                    Status:
             """.trimIndent()
         )
     }
