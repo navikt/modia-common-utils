@@ -16,7 +16,7 @@ internal class ConcurrencyUtilsTest {
     internal fun `runs tasks in parallel`() {
         val time = measureTimeMillis { ConcurrencyUtils.inParallel(slowtask, slowtask) }
 
-        assertTrue(time in (1000 plusminus 100))
+        assertTrue(time in (1000 plusminus 200))
     }
 
     @Test
@@ -25,7 +25,7 @@ internal class ConcurrencyUtilsTest {
         val time = measureTimeMillis {
             tasks.runInParallel()
         }
-        assertTrue(time in (1000 plusminus 100))
+        assertTrue(time in (1000 plusminus 200))
     }
 
     @Test
