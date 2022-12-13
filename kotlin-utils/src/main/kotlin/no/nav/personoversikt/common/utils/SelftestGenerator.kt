@@ -21,13 +21,19 @@ class SelftestGenerator private constructor(private var config: Config) {
     class ErrorEvent(reporter: Reporter, val error: Throwable) : Event(reporter)
 
     private val statusmap = mutableMapOf<String, Event>()
+    private val metadatamap = mutableMapOf<String, Metadata>()
 
     internal fun register(event: Event) {
         statusmap[event.reporter.name] = event
     }
 
+    internal fun register(metadata: Metadata) {
+        metadatamap[metadata.name] = metadata
+    }
+
     internal fun clear() {
         statusmap.clear()
+        metadatamap.clear()
     }
 
     fun isAlive(): Boolean {
@@ -44,6 +50,7 @@ class SelftestGenerator private constructor(private var config: Config) {
         appendLine("Appname: ${config.appname}")
         appendLine("Version: ${config.version}")
         appendLine()
+        appendLine("Status:")
         for (result in statusmap.values) {
             val critical = if (result.reporter.critical) "(Critical)" else ""
             val status = when (result) {
@@ -51,7 +58,14 @@ class SelftestGenerator private constructor(private var config: Config) {
                 is OkEvent -> "OK"
                 is ErrorEvent -> "KO: ${result.error.message}"
             }
-            appendLine("Name: ${result.reporter.name} $critical Status: $status")
+            appendLine("\tName: ${result.reporter.name} $critical Status: $status")
+        }
+        if (metadatamap.isNotEmpty()) {
+            appendLine()
+            appendLine("Metadata:")
+            for (metadata in metadatamap.values) {
+                appendLine("\tName: ${metadata.name} Value: ${metadata.fn()}")
+            }
         }
     }
 
@@ -77,6 +91,12 @@ class SelftestGenerator private constructor(private var config: Config) {
             } catch (e: Throwable) {
                 reportError(e)
             }
+        }
+    }
+
+    class Metadata(val name: String, val fn: () -> String) {
+        init {
+            instance.register(this)
         }
     }
 }

@@ -13,7 +13,7 @@ object Selftest {
         var contextpath: String = ""
     ) : SelftestGenerator.Config(appname, version)
 
-    val Plugin = createApplicationPlugin("Selftest", { Config() }) {
+    val Plugin = createApplicationPlugin("Selftest", ::Config) {
         val config = pluginConfig
         val selftest = SelftestGenerator.getInstance(pluginConfig)
         with(application) {

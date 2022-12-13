@@ -56,8 +56,9 @@ internal class SelftestGeneratorTest {
                     Appname: testapp
                     Version: 1.0.0
                     
-                    Name: dependency  Status: Registered
-                    Name: other-dependency (Critical) Status: Registered
+                    Status:
+                    	Name: dependency  Status: Registered
+                    	Name: other-dependency (Critical) Status: Registered
             """.trimIndent()
         )
 
@@ -69,8 +70,9 @@ internal class SelftestGeneratorTest {
                     Appname: testapp
                     Version: 1.0.0
                     
-                    Name: dependency  Status: OK
-                    Name: other-dependency (Critical) Status: OK
+                    Status:
+                    	Name: dependency  Status: OK
+                    	Name: other-dependency (Critical) Status: OK
             """.trimIndent()
         )
 
@@ -82,8 +84,32 @@ internal class SelftestGeneratorTest {
                 Appname: testapp
                 Version: 1.0.0
                 
-                Name: dependency  Status: KO: Non critical error
-                Name: other-dependency (Critical) Status: KO: Critical error
+                Status:
+                	Name: dependency  Status: KO: Non critical error
+                	Name: other-dependency (Critical) Status: KO: Critical error
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun `should include metadata fields if registered`() {
+        SelftestGenerator.Reporter("dependency", critical = false).reportOk()
+        SelftestGenerator.Reporter("other-dependency", critical = true).reportOk()
+        SelftestGenerator.Metadata("some metadata") {
+            "There are 1337 users logged in"
+        }
+
+        selftest.assertSelftestContent(
+            """
+                    Appname: testapp
+                    Version: 1.0.0
+                    
+                    Status:
+                    	Name: dependency  Status: OK
+                    	Name: other-dependency (Critical) Status: OK
+                    
+                    Metadata:
+                    	Name: some metadata Value: There are 1337 users logged in
             """.trimIndent()
         )
     }
