@@ -93,8 +93,8 @@ class Security(private val providers: List<AuthProviderConfig>) {
         return providers.map { getToken(call, it) }
     }
 
-    fun setupMock(context: AuthenticationConfig, subject: String) {
-        val token = JWT.create().withSubject(subject).sign(Algorithm.none())
+    fun setupMock(context: AuthenticationConfig, subject: String, oid: String? = null) {
+        val token = JWT.create().withSubject(subject).withClaim("oid", oid).sign(Algorithm.none())
         val principal = SubjectPrincipal(token)
 
         for (provider in providers) {
