@@ -22,14 +22,15 @@
         <kotlin.version>1.9.23</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlinx.serialization.version>1.4.0-RC</kotlinx.serialization.version>
+        <ktor.version>2.3.9</ktor.version>
         <java.version>11</java.version>
         <prometheus.version>1.12.4</prometheus.version>
-        <logback.version>1.2.13</logback.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <logback.version>1.5.3</logback.version>
+        <slf4j.version>2.0.12</slf4j.version>
         <logstash.version>7.4</logstash.version>
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.17.0</jackson.version>
         <junit.version>5.8.2</junit.version>
-        <mockk.version>1.12.4</mockk.version>
+        <mockk.version>1.13.10</mockk.version>
     </properties>
 
     <licenses>
@@ -93,7 +94,7 @@
             <dependency>
                 <groupId>io.ktor</groupId>
                 <artifactId>ktor-bom</artifactId>
-                <version>2.0.3</version>
+                <version>${ktor.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -103,9 +104,9 @@
                 <version>${prometheus.version}</version>
             </dependency>
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>4.0.1</version>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>6.0.0</version>
             </dependency>
 
             <dependency>
@@ -139,7 +140,7 @@
             <!-- Testing dependencies -->
             <dependency>
                 <groupId>io.mockk</groupId>
-                <artifactId>mockk</artifactId>
+                <artifactId>mockk-jvm</artifactId>
                 <version>${mockk.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -200,8 +201,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <!--suppress MavenModelInspection -->
-                    <argLine>${jacoco.agent.argLine} -Xmx2g</argLine>
+                    <!-- https://github.com/mockk/mockk/issues/681#issuecomment-1297467111 -->
+                    <argLine>
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.lang.reflect=ALL-UNNAMED <!-- handy for spying spring proxies -->
+                    </argLine>
 
                     <!--
                     Å sette `reuseFork` til `true` vil føre til at surefire fyrer opp en separat JVM for hver
@@ -219,7 +223,6 @@
 
                     <forkCount>1C</forkCount> <!-- fyr opp 1 JVM per cpu-kjerne -->
 
-                    <argLine>-Xmx1024m</argLine> <!-- Gi nok minne for å unngå terminerende JVM-er -->
 
                     <!-- fjerner edge-caser ved nøstede classloadere, som f.eks. hvis man tester med jetty -->
                     <useSystemClassLoader>false</useSystemClassLoader>
