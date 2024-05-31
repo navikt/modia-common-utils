@@ -21,7 +21,7 @@
     <properties>
         <kotlin.version>1.9.23</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <kotlinx.serialization.version>1.4.0-RC</kotlinx.serialization.version>
+        <kotlinx.serialization.version>1.4.0</kotlinx.serialization.version>
         <ktor.version>2.3.10</ktor.version>
         <java.version>11</java.version>
         <prometheus.version>1.12.4</prometheus.version>
