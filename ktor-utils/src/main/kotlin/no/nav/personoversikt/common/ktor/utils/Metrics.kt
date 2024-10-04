@@ -19,6 +19,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 object Metrics {
     class Config {
         var contextpath: String = ""
+        var registry: PrometheusMeterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
         // Expose configuration of MicrometerMetrics, defaults copied
         var metricName: String = "ktor.http.server.requests"
@@ -38,12 +39,12 @@ object Metrics {
             timerBuilder = block
         }
     }
-    val Registry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+
     val Plugin = createApplicationPlugin("Metrics", Metrics::Config) {
         val config = pluginConfig
         with(application) {
             install(MicrometerMetrics) {
-                registry = Registry
+                registry = config.registry
                 metricName = config.metricName
                 meterBinders = config.meterBinders
                 distributionStatisticConfig = config.distributionStatisticConfig
@@ -54,7 +55,7 @@ object Metrics {
                 route(config.contextpath) {
                     route("internal") {
                         get("metrics") {
-                            call.respondText(Registry.scrape())
+                            call.respondText(config.registry.scrape())
                         }
                     }
                 }
