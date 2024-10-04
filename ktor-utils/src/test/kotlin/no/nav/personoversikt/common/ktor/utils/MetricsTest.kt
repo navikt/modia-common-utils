@@ -5,6 +5,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -36,11 +38,15 @@ internal class MetricsTest {
         // Must alias plugin to ensure Metrics.kt is only loaded once by the classloader during test
         val plugin = Metrics.Plugin
 
+        val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+
         application {
-            install(plugin)
+            install(plugin) {
+                registry = meterRegistry
+            }
         }
 
-        val counter = Metrics.Registry.counter("testcounter")
+        val counter = meterRegistry.counter("testcounter")
         counter.increment(13.0)
 
         val response = client.get("/internal/metrics")
