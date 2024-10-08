@@ -45,7 +45,8 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val name: String?,
         val jwksConfig: JwksConfig,
         val tokenLocations: List<TokenLocation> = emptyList(),
-        val overrides: JWTAuthenticationProvider.Config.() -> Unit = {}
+        val overrides: JWTAuthenticationProvider.Config.() -> Unit = {},
+        val createPrincipal: ((token: String, payload: Payload) -> SubjectPrincipal)? = null
     )
 
     sealed interface TokenLocation {
@@ -154,7 +155,8 @@ class Security(private val providers: List<AuthProviderConfig>) {
                 "Issuer did not match provider config. Expected: '${provider.jwksConfig.issuer}', but got: '${credentials.payload.issuer}'"
             }
             val token = checkNotNull(getToken(this, provider)) { "Could not get JWT for provider '${provider.name}'" }
-            val principal = SubjectPrincipal(token = token, payload = credentials.payload)
+            val principal = provider.createPrincipal?.invoke(token, credentials.payload)
+                ?: SubjectPrincipal(token = token, payload = credentials.payload)
             checkNotNull(principal.subject) { "Could not get subject from jwt" }
             principal
         } catch (e: Throwable) {
