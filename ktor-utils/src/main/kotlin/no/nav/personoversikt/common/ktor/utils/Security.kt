@@ -25,6 +25,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
         private val logger = LoggerFactory.getLogger(Security::class.java)
         const val UNAUTHENTICATED = "Unauthenticated"
         const val JWT_PARSE_ERROR = "JWT parse error"
+        const val AAD_NAV_IDENT_CLAIM = "NAVident"
     }
 
     sealed interface JwksConfig {
@@ -45,8 +46,8 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val name: String?,
         val jwksConfig: JwksConfig,
         val tokenLocations: List<TokenLocation> = emptyList(),
+        val useJWTPrincipal: Boolean = false,
         val overrides: JWTAuthenticationProvider.Config.() -> Unit = {},
-        val createPrincipal: ((token: String, payload: Payload) -> SubjectPrincipal)? = null
     )
 
     sealed interface TokenLocation {
@@ -76,7 +77,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
     class SubjectPrincipal(val token: String, val payload: Payload) : Principal {
         constructor(token: String) : this(token, JWT.decode(token))
 
-        val subject: String? = payload.getClaim("NAVident")?.asString() ?: payload.subject
+        val subject: String? = payload.getClaim(AAD_NAV_IDENT_CLAIM)?.asString() ?: payload.subject
     }
 
     private val cryptermap = providers
@@ -114,7 +115,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
                     parseAuthorizationHeader(getToken(it, provider) ?: "")
                 }
                 verifier(makeJwkProvider(provider.jwksConfig.jwksUrl))
-                validate { validateJWT(it, provider) }
+                validate { if (provider.useJWTPrincipal) validateJWTWithJWTPrincipal(it, provider) else validateJWT(it, provider) }
                 apply(provider.overrides)
             }
         }
@@ -155,9 +156,24 @@ class Security(private val providers: List<AuthProviderConfig>) {
                 "Issuer did not match provider config. Expected: '${provider.jwksConfig.issuer}', but got: '${credentials.payload.issuer}'"
             }
             val token = checkNotNull(getToken(this, provider)) { "Could not get JWT for provider '${provider.name}'" }
-            val principal = provider.createPrincipal?.invoke(token, credentials.payload)
-                ?: SubjectPrincipal(token = token, payload = credentials.payload)
+            val principal = SubjectPrincipal(token = token, payload = credentials.payload)
             checkNotNull(principal.subject) { "Could not get subject from jwt" }
+            principal
+        } catch (e: Throwable) {
+            logger.error("Failed to validate JWT", e)
+            null
+        }
+    }
+
+    private fun ApplicationCall.validateJWTWithJWTPrincipal(credentials: JWTCredential, provider: AuthProviderConfig): JWTPrincipal? {
+        return try {
+            checkNotNull(credentials.payload.audience) { "Audience was not present in jwt" }
+            check(credentials.payload.issuer == provider.jwksConfig.issuer) {
+                "Issuer did not match provider config. Expected: '${provider.jwksConfig.issuer}', but got: '${credentials.payload.issuer}'"
+            }
+            val token = checkNotNull(getToken(this, provider)) { "Could not get JWT for provider '${provider.name}'" }
+            val principal = JWTPrincipal(payload = credentials.payload)
+            checkNotNull(principal.getClaim(AAD_NAV_IDENT_CLAIM, String::class)) { "Could not get subject from jwt" }
             principal
         } catch (e: Throwable) {
             logger.error("Failed to validate JWT", e)
