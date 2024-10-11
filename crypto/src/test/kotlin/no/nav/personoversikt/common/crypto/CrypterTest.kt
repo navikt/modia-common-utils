@@ -10,16 +10,18 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 internal class CrypterTest {
-
     private val crypter = Crypter("dummy")
 
     companion object {
         @JvmStatic
-        fun plaintext(): List<Arguments> = listOf(
-            Arguments.of("💩"),
-            Arguments.of("plaintext"),
-            Arguments.of("https://github.com/navikt/modiapersonoversikt-api/blob/dev/web/src/test/java/no/nav/modiapersonoversikt/infrastructure/kabac/utils/CombiningAlgorithmTest.kt"),
-        )
+        fun plaintext(): List<Arguments> =
+            listOf(
+                Arguments.of("💩"),
+                Arguments.of("plaintext"),
+                Arguments.of(
+                    "https://github.com/navikt/modiapersonoversikt-api/blob/dev/web/src/test/java/no/nav/modiapersonoversikt/infrastructure/kabac/utils/CombiningAlgorithmTest.kt",
+                ),
+            )
     }
 
     @ParameterizedTest
@@ -37,11 +39,12 @@ internal class CrypterTest {
 
     @Test
     internal fun `should not throw exception on decrypt`() {
-        val result = assertDoesNotThrow(
-            ThrowingSupplier {
-                crypter.decrypt("")
-            }
-        )
+        val result =
+            assertDoesNotThrow(
+                ThrowingSupplier {
+                    crypter.decrypt("")
+                },
+            )
         assertTrue(result.isFailure)
     }
 }

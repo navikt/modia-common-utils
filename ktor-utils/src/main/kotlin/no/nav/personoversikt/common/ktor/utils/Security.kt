@@ -19,8 +19,11 @@ import no.nav.personoversikt.common.utils.StringUtils.removePrefix
 import org.slf4j.LoggerFactory
 import java.net.URL
 
-class Security(private val providers: List<AuthProviderConfig>) {
+class Security(
+    private val providers: List<AuthProviderConfig>,
+) {
     constructor(vararg providers: AuthProviderConfig) : this(providers.asList())
+
     companion object {
         private val logger = LoggerFactory.getLogger(Security::class.java)
         const val UNAUTHENTICATED = "Unauthenticated"
@@ -32,8 +35,14 @@ class Security(private val providers: List<AuthProviderConfig>) {
         val jwksUrl: String
         val issuer: String
 
-        class JwksUrl(override val jwksUrl: String, override val issuer: String) : JwksConfig
-        class OidcWellKnownUrl(url: String) : JwksConfig {
+        class JwksUrl(
+            override val jwksUrl: String,
+            override val issuer: String,
+        ) : JwksConfig
+
+        class OidcWellKnownUrl(
+            url: String,
+        ) : JwksConfig {
             private val oidcClient = OidcClient(url)
 
             private val config: OidcClient.OidcDiscoveryConfig by lazy { runBlocking(Dispatchers.IO) { oidcClient.fetch() } }
@@ -42,6 +51,7 @@ class Security(private val providers: List<AuthProviderConfig>) {
             override val issuer: String by lazy { config.issuer }
         }
     }
+
     data class AuthProviderConfig(
         val name: String?,
         val jwksConfig: JwksConfig,
@@ -52,8 +62,13 @@ class Security(private val providers: List<AuthProviderConfig>) {
 
     sealed interface TokenLocation {
         val encryptionKey: String?
+
         fun extract(call: ApplicationCall): String?
-        fun getToken(call: ApplicationCall, cryptermap: Map<String, Crypter>): String? {
+
+        fun getToken(
+            call: ApplicationCall,
+            cryptermap: Map<String, Crypter>,
+        ): String? {
             val value = extract(call) ?: return null
             val crypter = cryptermap[encryptionKey] ?: return value
             return crypter.decrypt(value).getOrNull()
@@ -61,42 +76,51 @@ class Security(private val providers: List<AuthProviderConfig>) {
 
         class Cookie(
             private val name: String,
-            override val encryptionKey: String? = null
+            override val encryptionKey: String? = null,
         ) : TokenLocation {
             override fun extract(call: ApplicationCall): String? = call.request.cookies[name]
         }
 
         class Header(
             private val headerName: String = HttpHeaders.Authorization,
-            override val encryptionKey: String? = null
+            override val encryptionKey: String? = null,
         ) : TokenLocation {
             override fun extract(call: ApplicationCall): String? = call.request.header(headerName)
         }
     }
 
-    class SubjectPrincipal(val token: String, val payload: Payload) : Principal {
+    class SubjectPrincipal(
+        val token: String,
+        val payload: Payload,
+    ) : Principal {
         constructor(token: String) : this(token, JWT.decode(token))
 
         val subject: String? = payload.getClaim(AAD_NAV_IDENT_CLAIM)?.asString() ?: payload.subject
     }
 
-    private val cryptermap = providers
-        .flatMap { it.tokenLocations }
-        .mapNotNull { it.encryptionKey }
-        .associateWith { Crypter(it) }
+    private val cryptermap =
+        providers
+            .flatMap { it.tokenLocations }
+            .mapNotNull { it.encryptionKey }
+            .associateWith { Crypter(it) }
 
     val authproviders: Array<String?> = providers.map { it.name }.toTypedArray()
 
-    fun getSubject(call: ApplicationCall): List<String> {
-        return providers.map { getSubject(call, it) }
-    }
+    fun getSubject(call: ApplicationCall): List<String> = providers.map { getSubject(call, it) }
 
-    fun getToken(call: ApplicationCall): List<String?> {
-        return providers.map { getToken(call, it) }
-    }
+    fun getToken(call: ApplicationCall): List<String?> = providers.map { getToken(call, it) }
 
-    fun setupMock(context: AuthenticationConfig, subject: String, oid: String? = null) {
-        val token = JWT.create().withSubject(subject).withClaim("oid", oid).sign(Algorithm.none())
+    fun setupMock(
+        context: AuthenticationConfig,
+        subject: String,
+        oid: String? = null,
+    ) {
+        val token =
+            JWT
+                .create()
+                .withSubject(subject)
+                .withClaim("oid", oid)
+                .sign(Algorithm.none())
         val principal = SubjectPrincipal(token)
 
         for (provider in providers) {
@@ -121,8 +145,11 @@ class Security(private val providers: List<AuthProviderConfig>) {
         }
     }
 
-    private fun getSubject(call: ApplicationCall, provider: AuthProviderConfig): String {
-        return try {
+    private fun getSubject(
+        call: ApplicationCall,
+        provider: AuthProviderConfig,
+    ): String =
+        try {
             getToken(call, provider)
                 ?.removePrefix("Bearer ", ignoreCase = true)
                 ?.let(JWT::decode)
@@ -133,24 +160,28 @@ class Security(private val providers: List<AuthProviderConfig>) {
         } catch (e: Throwable) {
             JWT_PARSE_ERROR
         }
-    }
 
-    private fun getToken(call: ApplicationCall, provider: AuthProviderConfig): String? {
-        return provider.tokenLocations.firstNotNullOfOrNull { location ->
-            location.getToken(call, cryptermap)
+    private fun getToken(
+        call: ApplicationCall,
+        provider: AuthProviderConfig,
+    ): String? =
+        provider.tokenLocations.firstNotNullOfOrNull { location ->
+            location
+                .getToken(call, cryptermap)
                 ?.addPrefixIfMissing("Bearer ", ignoreCase = true)
         }
-    }
 
-    private fun makeJwkProvider(jwksUrl: String): JwkProvider {
-        return JwkProviderBuilder(URL(jwksUrl))
+    private fun makeJwkProvider(jwksUrl: String): JwkProvider =
+        JwkProviderBuilder(URL(jwksUrl))
             .cached(true)
             .rateLimited(true)
             .build()
-    }
 
-    private fun ApplicationCall.validateJWT(credentials: JWTCredential, provider: AuthProviderConfig): SubjectPrincipal? {
-        return try {
+    private fun ApplicationCall.validateJWT(
+        credentials: JWTCredential,
+        provider: AuthProviderConfig,
+    ): SubjectPrincipal? =
+        try {
             checkNotNull(credentials.payload.audience) { "Audience was not present in jwt" }
             check(credentials.payload.issuer == provider.jwksConfig.issuer) {
                 "Issuer did not match provider config. Expected: '${provider.jwksConfig.issuer}', but got: '${credentials.payload.issuer}'"
@@ -163,10 +194,12 @@ class Security(private val providers: List<AuthProviderConfig>) {
             logger.error("Failed to validate JWT", e)
             null
         }
-    }
 
-    private fun ApplicationCall.validateJWTWithJWTPrincipal(credentials: JWTCredential, provider: AuthProviderConfig): JWTPrincipal? {
-        return try {
+    private fun ApplicationCall.validateJWTWithJWTPrincipal(
+        credentials: JWTCredential,
+        provider: AuthProviderConfig,
+    ): JWTPrincipal? =
+        try {
             checkNotNull(credentials.payload.audience) { "Audience was not present in jwt" }
             check(credentials.payload.issuer == provider.jwksConfig.issuer) {
                 "Issuer did not match provider config. Expected: '${provider.jwksConfig.issuer}', but got: '${credentials.payload.issuer}'"
@@ -179,5 +212,4 @@ class Security(private val providers: List<AuthProviderConfig>) {
             logger.error("Failed to validate JWT", e)
             null
         }
-    }
 }

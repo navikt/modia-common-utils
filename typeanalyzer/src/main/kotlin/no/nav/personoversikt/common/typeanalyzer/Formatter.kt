@@ -3,13 +3,24 @@ package no.nav.personoversikt.common.typeanalyzer
 import kotlin.random.Random
 
 interface Format {
-    class Type(val name: String, val fields: List<Field>)
-    class Field(val name: String, val type: String, val nullability: Boolean)
+    class Type(
+        val name: String,
+        val fields: List<Field>,
+    )
+
+    class Field(
+        val name: String,
+        val type: String,
+        val nullability: Boolean,
+    )
 
     context(StringBuilder)
     fun appendType(type: Type)
 
-    fun fieldType(type: CaptureType, typeReference: String?): String
+    fun fieldType(
+        type: CaptureType,
+        typeReference: String?,
+    ): String
 }
 
 object TypescriptFormat : Format {
@@ -22,8 +33,11 @@ object TypescriptFormat : Format {
         appendLine("}")
     }
 
-    override fun fieldType(type: CaptureType, typeReference: String?): String {
-        return when (type) {
+    override fun fieldType(
+        type: CaptureType,
+        typeReference: String?,
+    ): String =
+        when (type) {
             CaptureType.UNKNOWN -> "any"
             CaptureType.NULL -> "null"
             CaptureType.BOOLEAN -> "boolean"
@@ -33,7 +47,6 @@ object TypescriptFormat : Format {
             CaptureType.LIST -> "Array<${requireNotNull(typeReference)}>"
             CaptureType.OBJECT -> requireNotNull(typeReference)
         }
-    }
 }
 
 object KotlinFormat : Format {
@@ -46,8 +59,11 @@ object KotlinFormat : Format {
         appendLine(")")
     }
 
-    override fun fieldType(type: CaptureType, typeReference: String?): String {
-        return when (type) {
+    override fun fieldType(
+        type: CaptureType,
+        typeReference: String?,
+    ): String =
+        when (type) {
             CaptureType.UNKNOWN -> "Any"
             CaptureType.NULL -> "Unit"
             CaptureType.BOOLEAN -> "Boolean"
@@ -57,11 +73,14 @@ object KotlinFormat : Format {
             CaptureType.LIST -> "List<${requireNotNull(typeReference)}>"
             CaptureType.OBJECT -> requireNotNull(typeReference)
         }
-    }
 }
 
-class Formatter(val format: Format, private val rnd: Random = Random.Default) {
+class Formatter(
+    val format: Format,
+    private val rnd: Random = Random.Default,
+) {
     val nameMap: MutableMap<ObjectCapture, String> = mutableMapOf()
+
     fun print(capture: Capture): String {
         val types = capture.findTypes()
         return buildString {
@@ -72,12 +91,13 @@ class Formatter(val format: Format, private val rnd: Random = Random.Default) {
         }
     }
 
-    private fun Capture.findTypes(current: Map<ObjectCapture, Format.Type> = emptyMap()): Map<ObjectCapture, Format.Type> {
-        return when (this) {
+    private fun Capture.findTypes(current: Map<ObjectCapture, Format.Type> = emptyMap()): Map<ObjectCapture, Format.Type> =
+        when (this) {
             is ObjectCapture -> {
-                val fieldTypes: Map<ObjectCapture, Format.Type> = this.fields.values
-                    .map { it.findTypes() }
-                    .reduce { acc, other -> acc.plus(other) }
+                val fieldTypes: Map<ObjectCapture, Format.Type> =
+                    this.fields.values
+                        .map { it.findTypes() }
+                        .reduce { acc, other -> acc.plus(other) }
                 current
                     .plus(this to createType(this))
                     .plus(fieldTypes)
@@ -85,36 +105,38 @@ class Formatter(val format: Format, private val rnd: Random = Random.Default) {
             is ListCapture -> current.plus(this.subtype.findTypes())
             else -> current
         }
-    }
 
     private fun createType(capture: ObjectCapture): Format.Type {
-        val name = nameMap.computeIfAbsent(capture) {
-            "Generated_${Integer.toHexString(rnd.nextInt())}"
-        }
+        val name =
+            nameMap.computeIfAbsent(capture) {
+                "Generated_${Integer.toHexString(rnd.nextInt())}"
+            }
         return Format.Type(
             name = name,
-            fields = capture.fields.map { entry ->
-                Format.Field(
-                    name = entry.key,
-                    type = createTypeName(entry.value),
-                    nullability = when (val value = entry.value) {
-                        is PrimitiveCapture -> value.nullable
-                        is ListCapture -> value.nullable
-                        is ObjectCapture -> value.nullable
-                        else -> true
-                    }
-                )
-            }
+            fields =
+                capture.fields.map { entry ->
+                    Format.Field(
+                        name = entry.key,
+                        type = createTypeName(entry.value),
+                        nullability =
+                            when (val value = entry.value) {
+                                is PrimitiveCapture -> value.nullable
+                                is ListCapture -> value.nullable
+                                is ObjectCapture -> value.nullable
+                                else -> true
+                            },
+                    )
+                },
         )
     }
 
-    private fun createTypeName(capture: Capture): String {
-        return when (capture) {
+    private fun createTypeName(capture: Capture): String =
+        when (capture) {
             is ListCapture -> format.fieldType(capture.type, createTypeName(capture.subtype))
-            is ObjectCapture -> nameMap.computeIfAbsent(capture) {
-                "Generated_${Integer.toHexString(rnd.nextInt())}"
-            }
+            is ObjectCapture ->
+                nameMap.computeIfAbsent(capture) {
+                    "Generated_${Integer.toHexString(rnd.nextInt())}"
+                }
             else -> format.fieldType(capture.type, null)
         }
-    }
 }

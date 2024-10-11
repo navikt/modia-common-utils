@@ -7,9 +7,10 @@ import org.slf4j.event.Level
 internal class TjenestekallLoggTest {
     @Test
     internal fun `should expose raw slf4j Logger`() {
-        val capture = TjenestekallLogg.raw.captureLogs {
-            TjenestekallLogg.raw.info("This is my message")
-        }
+        val capture =
+            TjenestekallLogg.raw.captureLogs {
+                TjenestekallLogg.raw.info("This is my message")
+            }
         capture
             .hasSize(1)
             .logline { messageEquals("This is my message") }
@@ -17,13 +18,14 @@ internal class TjenestekallLoggTest {
 
     @Test
     internal fun `should support fields and tags`() {
-        val capture = TjenestekallLogg.raw.captureLogs {
-            TjenestekallLogg.warn(
-                header = "Header",
-                fields = mapOf("field_key" to "field_value"),
-                tags = mapOf("tag_key" to "tag_value"),
-            )
-        }
+        val capture =
+            TjenestekallLogg.raw.captureLogs {
+                TjenestekallLogg.warn(
+                    header = "Header",
+                    fields = mapOf("field_key" to "field_value"),
+                    tags = mapOf("tag_key" to "tag_value"),
+                )
+            }
 
         capture
             .hasSize(1)
@@ -37,13 +39,14 @@ internal class TjenestekallLoggTest {
 
     @Test
     internal fun `should support typed logs`() {
-        val capture = TjenestekallLogg.raw.captureLogs {
-            TjenestekallLogg.withLogType("TestLogger").warn(
-                header = "Header",
-                fields = mapOf("field_key" to "field_value"),
-                tags = mapOf("tag_key" to "tag_value"),
-            )
-        }
+        val capture =
+            TjenestekallLogg.raw.captureLogs {
+                TjenestekallLogg.withLogType("TestLogger").warn(
+                    header = "Header",
+                    fields = mapOf("field_key" to "field_value"),
+                    tags = mapOf("tag_key" to "tag_value"),
+                )
+            }
 
         capture
             .hasSize(1)

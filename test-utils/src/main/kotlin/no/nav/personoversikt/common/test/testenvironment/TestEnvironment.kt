@@ -1,6 +1,8 @@
 package no.nav.personoversikt.common.test.testenvironment
 
-class TestEnvironment(private val testEnvironment: () -> Map<String, String?>) {
+class TestEnvironment(
+    private val testEnvironment: () -> Map<String, String?>,
+) {
     private var originalEnvironment: Map<String, String?>? = null
 
     constructor(testEnvironment: Map<String, String?>) : this({ testEnvironment })
@@ -12,14 +14,18 @@ class TestEnvironment(private val testEnvironment: () -> Map<String, String?>) {
     }
 
     internal fun afterTestExecution() {
-        val environment = requireNotNull(originalEnvironment) {
-            "Missing original environment, ensure `setupTestEnvironment` has been called"
-        }
+        val environment =
+            requireNotNull(originalEnvironment) {
+                "Missing original environment, ensure `setupTestEnvironment` has been called"
+            }
         setAsEnvironment(environment)
     }
 
     companion object {
-        fun withEnvironment(environment: Map<String, String?>, block: () -> Unit) {
+        fun withEnvironment(
+            environment: Map<String, String?>,
+            block: () -> Unit,
+        ) {
             TestEnvironment(environment).run {
                 beforeTestExecution()
                 block()

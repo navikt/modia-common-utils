@@ -7,21 +7,25 @@ import kotlin.concurrent.schedule
 import kotlin.math.pow
 import kotlin.time.Duration
 
-class Retry(private val config: Config) {
-
+class Retry(
+    private val config: Config,
+) {
     data class Config(
         val maxRetries: Int = Int.MAX_VALUE,
         val initDelay: Duration,
         val growthFactor: Double,
         val delayLimit: Duration,
-        val scheduler: Timer = Timer()
+        val scheduler: Timer = Timer(),
     )
 
     private val log = getLogger(Retry::class.java)
 
     suspend fun run(block: suspend () -> Unit) = run(0, block)
 
-    private suspend fun run(attemptNumber: Int, block: suspend () -> Unit) {
+    private suspend fun run(
+        attemptNumber: Int,
+        block: suspend () -> Unit,
+    ) {
         try {
             block()
         } catch (e: Exception) {

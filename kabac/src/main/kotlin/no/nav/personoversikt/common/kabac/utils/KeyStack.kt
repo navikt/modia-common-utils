@@ -4,7 +4,11 @@ import no.nav.personoversikt.common.kabac.KabacException
 
 internal class KeyStack {
     private val stack = LinkedHashSet<Key<*>>()
-    fun <T> withCycleDetection(key: Key<*>, block: () -> T): T {
+
+    fun <T> withCycleDetection(
+        key: Key<*>,
+        block: () -> T,
+    ): T {
         if (!stack.add(key)) {
             val cyclePrefix = stack.joinToString(" -> ") { it.name }
             val cycleSuffix = key.name

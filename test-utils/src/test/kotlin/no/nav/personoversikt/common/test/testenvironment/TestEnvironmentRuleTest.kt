@@ -9,17 +9,19 @@ import org.junit.Test
 class TestEnvironmentRuleTest {
     @Rule
     @JvmField
-    val testenvironment = TestEnvironmentRule(
-        "key1" to "value1"
-    )
+    val testenvironment =
+        TestEnvironmentRule(
+            "key1" to "value1",
+        )
 
     @Rule
     @JvmField
-    val lazyenvironment = TestEnvironmentRule {
-        mapOf(
-            "key2" to "value2"
-        )
-    }
+    val lazyenvironment =
+        TestEnvironmentRule {
+            mapOf(
+                "key2" to "value2",
+            )
+        }
 
     @Test
     internal fun `should setup environment`() {

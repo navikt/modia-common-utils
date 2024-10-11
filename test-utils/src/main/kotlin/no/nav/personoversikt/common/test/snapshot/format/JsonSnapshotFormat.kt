@@ -7,27 +7,33 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator
 import no.nav.personoversikt.common.test.snapshot.SnapshotRunner
 
-private class JsonFormat(private val mapper: ObjectMapper) : SnapshotRunner.Fileformat {
+private class JsonFormat(
+    private val mapper: ObjectMapper,
+) : SnapshotRunner.Fileformat {
     override val fileExtension: String = "json"
 
-    override fun write(value: Any): String = mapper
-        .writerWithDefaultPrettyPrinter()
-        .writeValueAsString(value)
+    override fun write(value: Any): String =
+        mapper
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(value)
 
     override fun read(value: String): Any = mapper.readTree(value)
 
     companion object {
-        val plain: JsonMapper = JsonMapper.builder()
-            .findAndAddModules()
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
-            .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
-            .build()
+        val plain: JsonMapper =
+            JsonMapper
+                .builder()
+                .findAndAddModules()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
+                .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+                .build()
 
-        val typed: JsonMapper = plain
-            .rebuild()
-            .activateDefaultTyping(DefaultBaseTypeLimitingValidator())
-            .build()
+        val typed: JsonMapper =
+            plain
+                .rebuild()
+                .activateDefaultTyping(DefaultBaseTypeLimitingValidator())
+                .build()
     }
 }
 

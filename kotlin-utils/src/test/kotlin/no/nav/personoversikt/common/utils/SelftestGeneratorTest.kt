@@ -53,13 +53,13 @@ internal class SelftestGeneratorTest {
 
         selftest.assertSelftestContent(
             """
-                    Appname: testapp
-                    Version: 1.0.0
-                    
-                    Status:
-                    	Name: dependency  Status: Registered
-                    	Name: other-dependency (Critical) Status: Registered
-            """.trimIndent()
+            Appname: testapp
+            Version: 1.0.0
+            
+            Status:
+            	Name: dependency  Status: Registered
+            	Name: other-dependency (Critical) Status: Registered
+            """.trimIndent(),
         )
 
         nonCritical.reportOk()
@@ -67,13 +67,13 @@ internal class SelftestGeneratorTest {
 
         selftest.assertSelftestContent(
             """
-                    Appname: testapp
-                    Version: 1.0.0
-                    
-                    Status:
-                    	Name: dependency  Status: OK
-                    	Name: other-dependency (Critical) Status: OK
-            """.trimIndent()
+            Appname: testapp
+            Version: 1.0.0
+            
+            Status:
+            	Name: dependency  Status: OK
+            	Name: other-dependency (Critical) Status: OK
+            """.trimIndent(),
         )
 
         nonCritical.reportError(IllegalStateException("Non critical error"))
@@ -81,13 +81,13 @@ internal class SelftestGeneratorTest {
 
         selftest.assertSelftestContent(
             """
-                Appname: testapp
-                Version: 1.0.0
-                
-                Status:
-                	Name: dependency  Status: KO: Non critical error
-                	Name: other-dependency (Critical) Status: KO: Critical error
-            """.trimIndent()
+            Appname: testapp
+            Version: 1.0.0
+            
+            Status:
+            	Name: dependency  Status: KO: Non critical error
+            	Name: other-dependency (Critical) Status: KO: Critical error
+            """.trimIndent(),
         )
     }
 
@@ -101,20 +101,23 @@ internal class SelftestGeneratorTest {
 
         selftest.assertSelftestContent(
             """
-                    Appname: testapp
-                    Version: 1.0.0
-                    
-                    Status:
-                    	Name: dependency  Status: OK
-                    	Name: other-dependency (Critical) Status: OK
-                    
-                    Metadata:
-                    	Name: some metadata Value: There are 1337 users logged in
-            """.trimIndent()
+            Appname: testapp
+            Version: 1.0.0
+            
+            Status:
+            	Name: dependency  Status: OK
+            	Name: other-dependency (Critical) Status: OK
+            
+            Metadata:
+            	Name: some metadata Value: There are 1337 users logged in
+            """.trimIndent(),
         )
     }
 
-    private fun SelftestGenerator.assertStatus(isAlive: Boolean, isReady: Boolean) {
+    private fun SelftestGenerator.assertStatus(
+        isAlive: Boolean,
+        isReady: Boolean,
+    ) {
         assertEquals(isAlive, this.isAlive())
         assertEquals(isReady, this.isReady())
     }

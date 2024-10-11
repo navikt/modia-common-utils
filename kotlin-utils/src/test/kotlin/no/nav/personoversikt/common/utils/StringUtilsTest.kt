@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class StringUtilsTest {
-
     @Test
     internal fun `isNumeric should be true when text only contains digits`() {
         assertTrue("1234".isNumeric())

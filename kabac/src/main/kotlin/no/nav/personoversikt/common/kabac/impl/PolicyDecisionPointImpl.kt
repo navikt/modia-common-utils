@@ -12,7 +12,6 @@ class PolicyDecisionPointImpl : Kabac.PolicyDecisionPoint {
         return this
     }
 
-    override fun createEvaluationContext(attributes: List<AttributeValue<*>>): Kabac.EvaluationContext {
-        return EvaluationContextImpl(providerRegister.values + attributes)
-    }
+    override fun createEvaluationContext(attributes: List<AttributeValue<*>>): Kabac.EvaluationContext =
+        EvaluationContextImpl(providerRegister.values + attributes)
 }

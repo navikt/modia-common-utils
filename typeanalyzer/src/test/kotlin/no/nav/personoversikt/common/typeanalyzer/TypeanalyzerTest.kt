@@ -249,7 +249,7 @@ internal class TypeanalyzerTest {
     private fun CaptureAsserter<ObjectCapture>.assertObject(
         objectNullable: Boolean,
         listNullable: Boolean,
-        listElementNullable: Boolean
+        listElementNullable: Boolean,
     ): CaptureAsserter<ObjectCapture> {
         this.assert { base ->
             assertEquals(CaptureType.OBJECT, base.value.type)
@@ -264,7 +264,7 @@ internal class TypeanalyzerTest {
 
     private fun CaptureAsserter<ListCapture>.assertList(
         listNullable: Boolean,
-        listElementNullable: Boolean
+        listElementNullable: Boolean,
     ): CaptureAsserter<ListCapture> {
         this.assert { base ->
             assertEquals(CaptureType.LIST, base.value.type)
@@ -279,7 +279,7 @@ internal class TypeanalyzerTest {
 
     private fun CaptureAsserter<PrimitiveCapture>.assertPrimitive(
         type: CaptureType,
-        nullable: Boolean
+        nullable: Boolean,
     ): CaptureAsserter<PrimitiveCapture> {
         this.assert {
             assertEquals(type, it.value.type)
@@ -288,11 +288,11 @@ internal class TypeanalyzerTest {
         return this
     }
 
-    private fun ObjectCapture.getField(name: String): Capture {
-        return this.fields.getOrElse(name) { error("Key not found") }
-    }
+    private fun ObjectCapture.getField(name: String): Capture = this.fields.getOrElse(name) { error("Key not found") }
 
-    class CaptureAsserter<TYPE : Capture>(val value: TYPE) {
+    class CaptureAsserter<TYPE : Capture>(
+        val value: TYPE,
+    ) {
         companion object {
             fun assertCapture(value: Any?): CaptureAsserter<*> {
                 assertNotNull(value) { "Value cannot be null" }
@@ -304,8 +304,8 @@ internal class TypeanalyzerTest {
         inline fun <reified NEWTYPE : Capture> hasType(): CaptureAsserter<NEWTYPE> {
             assertTrue(value is NEWTYPE) {
                 """
-                    Expected value to be of ${NEWTYPE::class.simpleName} but was ${value::class.simpleName}
-                    $value
+                Expected value to be of ${NEWTYPE::class.simpleName} but was ${value::class.simpleName}
+                $value
                 """.trimIndent()
             }
             return CaptureAsserter(value as NEWTYPE)

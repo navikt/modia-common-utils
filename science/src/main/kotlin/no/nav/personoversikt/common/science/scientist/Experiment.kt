@@ -4,43 +4,46 @@ import com.fasterxml.jackson.databind.JsonNode
 import no.nav.personoversikt.common.science.Rate
 import no.nav.personoversikt.common.utils.ConcurrencyUtils.inParallel
 
-class Experiment<T> internal constructor(private val config: Scientist.Config) {
+class Experiment<T> internal constructor(
+    private val config: Scientist.Config,
+) {
     fun run(
         control: () -> T,
         experiment: () -> Any?,
         fields: ((Scientist.Markers, T?, Result<Any?>) -> Unit)? = null,
-        rate: Rate? = null
+        rate: Rate? = null,
     ): T = runWithResult(control, experiment, fields, rate).control
 
     fun runWithResult(
         control: () -> T,
         experiment: () -> Any?,
         fields: ((Scientist.Markers, T?, Result<Any?>) -> Unit)? = null,
-        rate: Rate? = null
+        rate: Rate? = null,
     ): Scientist.Result<T> {
         val shouldRunExperiment = Scientist.forceExperiment.get() == true || ((rate ?: config.rate).evaluate())
         if (!shouldRunExperiment) {
             return Scientist.Result(
                 experimentRun = false,
-                control = control()
+                control = control(),
             )
         }
 
         val markers = Scientist.Markers()
         val controlSwappable = config.threadSwappingFn(control) as () -> T
         val experimentSwappable = config.threadSwappingFn(experiment)
-        val (controlResult, experimentResult) = inParallel(
-            first = {
-                measureTimeInMillies {
-                    runCatching(controlSwappable)
-                }
-            },
-            second = {
-                measureTimeInMillies {
-                    runCatching(experimentSwappable)
-                }
-            }
-        )
+        val (controlResult, experimentResult) =
+            inParallel(
+                first = {
+                    measureTimeInMillies {
+                        runCatching(controlSwappable)
+                    }
+                },
+                second = {
+                    measureTimeInMillies {
+                        runCatching(experimentSwappable)
+                    }
+                },
+            )
 
         markers.fieldAndTag("controlTime", controlResult.time)
         markers.fieldAndTag("experimentTime", experimentResult.time)
@@ -53,10 +56,11 @@ class Experiment<T> internal constructor(private val config: Scientist.Config) {
                 markers.field("control", controlResult.value.getOrNull())
             }
         } else if (config.logAndCompareValues) {
-            val (ok, controlJson, experimentJson) = compareAndSerialize(
-                control = controlResult.value.getOrNull(),
-                experiment = experimentResult.value.getOrThrow()
-            )
+            val (ok, controlJson, experimentJson) =
+                compareAndSerialize(
+                    control = controlResult.value.getOrNull(),
+                    experiment = experimentResult.value.getOrThrow(),
+                )
             markers.fieldAndTag("ok", ok)
             markers.field("control", controlJson)
             markers.field("experiment", experimentJson)
@@ -68,7 +72,7 @@ class Experiment<T> internal constructor(private val config: Scientist.Config) {
             "[SCIENCE] ${config.name}",
             markers.fields,
             markers.tags,
-            experimentResult.value.exceptionOrNull()
+            experimentResult.value.exceptionOrNull(),
         )
 
         return Scientist.Result(
@@ -80,13 +84,16 @@ class Experiment<T> internal constructor(private val config: Scientist.Config) {
     }
 
     companion object {
-        private fun compareAndSerialize(control: Any?, experiment: Any?): Triple<Boolean, String, String> {
+        private fun compareAndSerialize(
+            control: Any?,
+            experiment: Any?,
+        ): Triple<Boolean, String, String> {
             val (controlJson, controlTree) = process(control)
             val (experimentJson, experimentTree) = process(experiment)
             return Triple(
                 controlTree == experimentTree,
                 controlJson,
-                experimentJson
+                experimentJson,
             )
         }
 
@@ -99,7 +106,10 @@ class Experiment<T> internal constructor(private val config: Scientist.Config) {
         /**
          * Should be removed once `kotlin.time.measureTimedValue` no longer is experimental
          */
-        internal data class TimedValue<T>(val value: T, val time: Long)
+        internal data class TimedValue<T>(
+            val value: T,
+            val time: Long,
+        )
 
         internal fun <T> measureTimeInMillies(block: () -> T): TimedValue<T> {
             val startTime = System.currentTimeMillis()

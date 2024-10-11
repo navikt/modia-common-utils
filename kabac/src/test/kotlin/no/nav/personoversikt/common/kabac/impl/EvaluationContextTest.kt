@@ -78,20 +78,23 @@ internal class EvaluationContextTest {
 
     @Test
     internal fun `values retrived from providers should be cached`() {
-        val fastMockProvider = object : Kabac.PolicyInformationPoint<String> {
-            var executionCount: Int = 0
-            override val key = Key<String>("mock-key")
-            override fun provide(ctx: Kabac.EvaluationContext): String {
-                executionCount++
-                return "mock-value"
+        val fastMockProvider =
+            object : Kabac.PolicyInformationPoint<String> {
+                var executionCount: Int = 0
+                override val key = Key<String>("mock-key")
+
+                override fun provide(ctx: Kabac.EvaluationContext): String {
+                    executionCount++
+                    return "mock-value"
+                }
             }
-        }
         val ctx = EvaluationContextImpl(listOf(fastMockProvider))
 
-        val values = listOf(
-            ctx.getValue(fastMockProvider),
-            ctx.getValue(fastMockProvider)
-        )
+        val values =
+            listOf(
+                ctx.getValue(fastMockProvider),
+                ctx.getValue(fastMockProvider),
+            )
 
         assertEquals(listOf("mock-value", "mock-value"), values)
         assertEquals(1, fastMockProvider.executionCount)
@@ -106,9 +109,10 @@ internal class EvaluationContextTest {
         repeat(size) { i -> providers.add(createCyclicProvider(keys[i], keys[(i + 1) % size])) }
         val ctx = EvaluationContextImpl(providers)
 
-        val exception = assertThrows<KabacException.CyclicDependenciesException> {
-            ctx.getValue(keys[0])
-        }
+        val exception =
+            assertThrows<KabacException.CyclicDependenciesException> {
+                ctx.getValue(keys[0])
+            }
         assertEquals("Cycle: key1 -> key2 -> key3 -> key4 -> key1", exception.message)
     }
 
@@ -117,14 +121,16 @@ internal class EvaluationContextTest {
         val size = 1
         val keys = mutableListOf<Key<Any>>()
         repeat(size) { i -> keys.add(Key("key${i + 1}")) }
-        val providers = mutableListOf<Kabac.PolicyInformationPoint<Any>>(
-            createCyclicProvider(keys[0], keys[0])
-        )
+        val providers =
+            mutableListOf<Kabac.PolicyInformationPoint<Any>>(
+                createCyclicProvider(keys[0], keys[0]),
+            )
         val ctx = EvaluationContextImpl(providers)
 
-        val exception = assertThrows<KabacException.CyclicDependenciesException> {
-            ctx.getValue(keys[0])
-        }
+        val exception =
+            assertThrows<KabacException.CyclicDependenciesException> {
+                ctx.getValue(keys[0])
+            }
 
         assertEquals("Cycle: key1 -> key1", exception.message)
     }
@@ -138,21 +144,25 @@ internal class EvaluationContextTest {
         repeat(size) { i -> providers.add(createCyclicProvider(keys[i], keys[(i + 1) % size])) }
 
         val providedKey = keys[5]
-        val ctx = EvaluationContextImpl(
-            providers + listOf(
-                AttributeValue(providedKey, "OK")
+        val ctx =
+            EvaluationContextImpl(
+                providers +
+                    listOf(
+                        AttributeValue(providedKey, "OK"),
+                    ),
             )
-        )
 
         val result = ctx.getValue(keys[0])
 
         assertEquals("OK", result)
     }
 
-    private fun <T> createCyclicProvider(key: Key<T>, dependent: Key<T>) = object : Kabac.PolicyInformationPoint<T> {
+    private fun <T> createCyclicProvider(
+        key: Key<T>,
+        dependent: Key<T>,
+    ) = object : Kabac.PolicyInformationPoint<T> {
         override val key: Key<T> = key
-        override fun provide(ctx: Kabac.EvaluationContext): T {
-            return ctx.getValue(dependent)
-        }
+
+        override fun provide(ctx: Kabac.EvaluationContext): T = ctx.getValue(dependent)
     }
 }

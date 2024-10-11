@@ -7,15 +7,18 @@ open class SnapshotExtension(
     path: String = "src/test/resources/snapshots",
     format: SnapshotRunner.Fileformat = JsonSnapshotFormat,
     debug: Boolean = false,
-    private val runner: SnapshotRunnerImpl = SnapshotRunnerImpl(path, format, debug)
+    private val runner: SnapshotRunnerImpl = SnapshotRunnerImpl(path, format, debug),
 ) : ParameterResolver,
     BeforeTestExecutionCallback,
     AfterTestExecutionCallback,
     SnapshotRunner by runner {
-
     override fun beforeTestExecution(context: ExtensionContext) {
         val className = context.testClass.get().name
-        val methodName = context.testMethod.get().name.replace("\$modiabrukerdialog_web", "")
+        val methodName =
+            context.testMethod
+                .get()
+                .name
+                .replace("\$modiabrukerdialog_web", "")
         runner.beforeSnapshotRunner("${className}_$methodName")
     }
 
@@ -23,11 +26,13 @@ open class SnapshotExtension(
         runner.afterSnapshotRunner()
     }
 
-    override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
-        return parameterContext.parameter.type == SnapshotExtension::class.java
-    }
+    override fun supportsParameter(
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext,
+    ): Boolean = parameterContext.parameter.type == SnapshotExtension::class.java
 
-    override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Any {
-        return this
-    }
+    override fun resolveParameter(
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext,
+    ): Any = this
 }

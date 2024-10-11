@@ -11,35 +11,35 @@ internal class LogAssertsTest {
 
     @Test
     internal fun `should capture log calls`() {
-        val captured = logger.captureLogs {
-            logger.info("Log this message")
-            logger.warn("Log another message")
-            logger.error("Log third message")
-        }
+        val captured =
+            logger.captureLogs {
+                logger.info("Log this message")
+                logger.warn("Log another message")
+                logger.error("Log third message")
+            }
 
         captured
             .hasSize(3)
             .logline {
                 hasLevel(Level.INFO)
                 messageEquals("Log this message")
-            }
-            .logline {
+            }.logline {
                 hasLevel(Level.WARN)
                 messageContains("another")
-            }
-            .logline {
+            }.logline {
                 hasLevel(Level.ERROR)
             }
     }
 
     @Test
     internal fun `should capture markers`() {
-        val captured = logger.captureLogs {
-            logger.info(
-                BasicMarkerFactory().getMarker("my-marker"),
-                "My message"
-            )
-        }
+        val captured =
+            logger.captureLogs {
+                logger.info(
+                    BasicMarkerFactory().getMarker("my-marker"),
+                    "My message",
+                )
+            }
 
         captured
             .hasSize(1)

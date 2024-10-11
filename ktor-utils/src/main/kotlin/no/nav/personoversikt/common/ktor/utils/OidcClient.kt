@@ -14,24 +14,29 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.net.URL
 
-class OidcClient(val wellKnownUrl: String, engine: HttpClientEngine = CIO_ENGINE) {
+class OidcClient(
+    val wellKnownUrl: String,
+    engine: HttpClientEngine = CIO_ENGINE,
+) {
     companion object {
         private val log = LoggerFactory.getLogger(OidcClient::class.java)
-        private val CIO_ENGINE = CIO.create {
-            val httpProxy = System.getenv("HTTP_PROXY")
-            httpProxy?.let { proxy = ProxyBuilder.http(Url(it)) }
-        }
+        private val CIO_ENGINE =
+            CIO.create {
+                val httpProxy = System.getenv("HTTP_PROXY")
+                httpProxy?.let { proxy = ProxyBuilder.http(Url(it)) }
+            }
     }
 
-    private val httpClient = HttpClient(engine) {
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    ignoreUnknownKeys = true
-                }
-            )
+    private val httpClient =
+        HttpClient(engine) {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                    },
+                )
+            }
         }
-    }
 
     @Serializable
     class OidcDiscoveryConfig(
@@ -41,8 +46,9 @@ class OidcClient(val wellKnownUrl: String, engine: HttpClientEngine = CIO_ENGINE
         @SerialName("token_endpoint") val tokenEndpoint: String,
     )
 
-    suspend fun fetch(): OidcDiscoveryConfig = httpClient
-        .runCatching { get(URL(wellKnownUrl)).body<OidcDiscoveryConfig>() }
-        .onFailure { log.error("COuld not fetch oidc-config from $wellKnownUrl", it) }
-        .getOrThrow()
+    suspend fun fetch(): OidcDiscoveryConfig =
+        httpClient
+            .runCatching { get(URL(wellKnownUrl)).body<OidcDiscoveryConfig>() }
+            .onFailure { log.error("COuld not fetch oidc-config from $wellKnownUrl", it) }
+            .getOrThrow()
 }

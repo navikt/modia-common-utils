@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 internal class EnvUtilsTest {
-    val PROP_KEY = "PROP-KEY"
-    val ENV_KEY = "PATH"
+    companion object {
+        const val PROP_KEY = "PROP-KEY"
+        const val ENV_KEY = "PATH"
+    }
 
     @BeforeEach
     internal fun setUp() {
@@ -29,25 +31,28 @@ internal class EnvUtilsTest {
 
     @Test
     internal fun `'getConfig' should use defaultValues map if key is not found`() {
-        val defaultValues = mapOf<String, String?>(
-            "UNKNOWN" to "fallback"
-        )
+        val defaultValues =
+            mapOf<String, String?>(
+                "UNKNOWN" to "fallback",
+            )
         assertEquals("fallback", EnvUtils.getConfig("UNKNOWN", defaultValues))
     }
 
     @Test
     internal fun `'getConfig' should return 'null' if key is not found in fallback`() {
-        val defaultValues = mapOf<String, String?>(
-            "UNKNOWN" to "fallback"
-        )
+        val defaultValues =
+            mapOf<String, String?>(
+                "UNKNOWN" to "fallback",
+            )
         assertEquals(null, EnvUtils.getConfig("VERY_UNKNOWN", defaultValues))
     }
 
     @Test
     internal fun `'getRequiredConfig' should throw exception if key is not found in fallback`() {
-        val defaultValues = mapOf<String, String?>(
-            "UNKNOWN" to "fallback"
-        )
+        val defaultValues =
+            mapOf<String, String?>(
+                "UNKNOWN" to "fallback",
+            )
         assertThrows<IllegalStateException> {
             EnvUtils.getRequiredConfig("VERY_UNKNOWN", defaultValues)
         }

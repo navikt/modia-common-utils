@@ -9,11 +9,14 @@ import java.nio.file.NoSuchFileException
 
 interface SnapshotRunner {
     fun assertMatches(value: Any?)
+
     fun updateSnapshot(value: Any?)
 
     interface Fileformat {
         val fileExtension: String
+
         fun write(value: Any): String
+
         fun read(value: String): Any
     }
 }
@@ -21,12 +24,13 @@ interface SnapshotRunner {
 class SnapshotRunnerImpl(
     path: String = "src/test/resources/snapshots",
     private val format: SnapshotRunner.Fileformat,
-    private val debug: Boolean = false
+    private val debug: Boolean = false,
 ) : SnapshotRunner {
     private val path: String
     private var name: String? = null
     private var counter: Int = 0
     private var hadMissingFile: Boolean = false
+
     init {
         if (path.endsWith("/")) {
             this.path = path
@@ -61,7 +65,10 @@ class SnapshotRunnerImpl(
         }
     }
 
-    private fun assertMatches(file: File, value: Any?) {
+    private fun assertMatches(
+        file: File,
+        value: Any?,
+    ) {
         try {
             val snapshot = createSnapshot(value)
             if (debug) {
@@ -76,19 +83,19 @@ class SnapshotRunnerImpl(
         }
     }
 
-    private fun getFile(id: Int): File {
-        return this.name
+    private fun getFile(id: Int): File =
+        this.name
             ?.let { File("$path$it-$id.${format.fileExtension}") }
             ?: throw IllegalStateException("No name...")
-    }
 
-    private fun save(file: File, value: Any?) {
+    private fun save(
+        file: File,
+        value: Any?,
+    ) {
         Files.writeString(file.toPath(), createSnapshot(value), StandardCharsets.UTF_8)
     }
 
-    private fun read(file: File): String {
-        return Files.readString(file.toPath(), StandardCharsets.UTF_8)
-    }
+    private fun read(file: File): String = Files.readString(file.toPath(), StandardCharsets.UTF_8)
 
     private fun createSnapshot(value: Any?): String {
         if (value == null) {

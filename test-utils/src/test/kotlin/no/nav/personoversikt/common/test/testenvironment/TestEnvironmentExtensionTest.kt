@@ -9,17 +9,19 @@ import org.junit.jupiter.api.extension.RegisterExtension
 class TestEnvironmentExtensionTest {
     @RegisterExtension
     @JvmField
-    val testEnvironment = TestEnvironmentExtension(
-        "key1" to "value1"
-    )
+    val testEnvironment =
+        TestEnvironmentExtension(
+            "key1" to "value1",
+        )
 
     @RegisterExtension
     @JvmField
-    val lazyEnvironment = TestEnvironmentExtension {
-        mapOf(
-            "key2" to "value2"
-        )
-    }
+    val lazyEnvironment =
+        TestEnvironmentExtension {
+            mapOf(
+                "key2" to "value2",
+            )
+        }
 
     @Test
     internal fun `should setup environment`() {
