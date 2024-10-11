@@ -29,26 +29,28 @@ internal class TypeanalyzerSnapshotTest {
     @Test
     internal fun `should reconcile nullability of fields preexisting fields`() {
         val analyzer = Typeanalyzer()
-        val captures = arrayOf(
-            analyzer.capture(valueObject),
-            analyzer.capture(RootObject()),
-            analyzer.capture(null),
-            analyzer.capture(
-                valueObject.copy(
-                    listOfStuff = listOf(
-                        Stuff(
-                            id = null,
-                            meta = mapOf("key" to null, "key2" to null)
-                        ),
-                        null,
-                        Stuff(
-                            id = null,
-                            meta = null
-                        )
-                    )
-                )
+        val captures =
+            arrayOf(
+                analyzer.capture(valueObject),
+                analyzer.capture(RootObject()),
+                analyzer.capture(null),
+                analyzer.capture(
+                    valueObject.copy(
+                        listOfStuff =
+                            listOf(
+                                Stuff(
+                                    id = null,
+                                    meta = mapOf("key" to null, "key2" to null),
+                                ),
+                                null,
+                                Stuff(
+                                    id = null,
+                                    meta = null,
+                                ),
+                            ),
+                    ),
+                ),
             )
-        )
 
         assertNotEquals(captures[0], analyzer.report())
         assertEquals(captures.last(), analyzer.report())
@@ -57,18 +59,21 @@ internal class TypeanalyzerSnapshotTest {
         }
     }
 
-    data class SimpleList(val list: List<String?>?)
+    data class SimpleList(
+        val list: List<String?>?,
+    )
 
     @Test
     internal fun `all nullability fields for list construct should be able to be updated`() {
         val analyzer = Typeanalyzer()
-        val captures = arrayOf(
-            analyzer.capture(SimpleList(emptyList())),
-            analyzer.capture(SimpleList(listOf("hei"))),
-            analyzer.capture(SimpleList(listOf("hei", null, "other"))),
-            analyzer.capture(SimpleList(null)),
-            analyzer.capture(null),
-        )
+        val captures =
+            arrayOf(
+                analyzer.capture(SimpleList(emptyList())),
+                analyzer.capture(SimpleList(listOf("hei"))),
+                analyzer.capture(SimpleList(listOf("hei", null, "other"))),
+                analyzer.capture(SimpleList(null)),
+                analyzer.capture(null),
+            )
 
         assertNotEquals(captures[0], analyzer.report())
         assertEquals(captures.last(), analyzer.report())
@@ -80,10 +85,11 @@ internal class TypeanalyzerSnapshotTest {
     @Test
     internal fun `key mismatch makes elements nullable`() {
         val analyzer = Typeanalyzer()
-        val captures = arrayOf(
-            analyzer.capture(mapOf("key1" to "value")),
-            analyzer.capture(mapOf("key2" to "value")),
-        )
+        val captures =
+            arrayOf(
+                analyzer.capture(mapOf("key1" to "value")),
+                analyzer.capture(mapOf("key2" to "value")),
+            )
 
         assertNotEquals(captures[0], analyzer.report())
         assertEquals(captures.last(), analyzer.report())
@@ -95,17 +101,18 @@ internal class TypeanalyzerSnapshotTest {
     @Test
     internal fun `should override types even if types mismatch`() {
         val analyzer = Typeanalyzer()
-        val captures = arrayOf(
-            analyzer.capture(valueObject),
-            analyzer.capture(
-                mapOf(
-                    "active" to true,
-                    "count" to null,
-                    "countLong" to null,
-                    "fraction" to null,
-                )
-            ),
-        )
+        val captures =
+            arrayOf(
+                analyzer.capture(valueObject),
+                analyzer.capture(
+                    mapOf(
+                        "active" to true,
+                        "count" to null,
+                        "countLong" to null,
+                        "fraction" to null,
+                    ),
+                ),
+            )
 
         assertNotEquals(captures[0], analyzer.report())
         assertEquals(captures.last(), analyzer.report())

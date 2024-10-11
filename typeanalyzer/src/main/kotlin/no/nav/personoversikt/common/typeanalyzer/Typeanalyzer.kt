@@ -13,9 +13,11 @@ import no.nav.personoversikt.common.logging.TjenestekallLogg
 
 open class Typeanalyzer {
     private val log = TjenestekallLogg.withLogType("typeanalyzer")
-    private val objectMapper = JsonMapper.builder()
-        .findAndAddModules()
-        .build()
+    private val objectMapper =
+        JsonMapper
+            .builder()
+            .findAndAddModules()
+            .build()
 
     private var previousCapture: Capture? = null
     val stats = CaptureStats()
@@ -35,9 +37,9 @@ open class Typeanalyzer {
                         mapOf(
                             "exception" to throwable.message,
                             "previousCapture" to previousCapture,
-                            "capture" to capture
+                            "capture" to capture,
                         ),
-                        throwable = throwable
+                        throwable = throwable,
                     )
                     stats.exception(throwable)
                 }
@@ -49,14 +51,12 @@ open class Typeanalyzer {
         return previousCapture
     }
 
-    fun report(): Capture {
-        return previousCapture ?: error("No value captured yet")
-    }
+    fun report(): Capture = previousCapture ?: error("No value captured yet")
 
     fun print(format: Format): String = Formatter(format).print(requireNotNull(previousCapture))
 
-    private fun JsonNode.toCapture(): Capture {
-        return when (this) {
+    private fun JsonNode.toCapture(): Capture =
+        when (this) {
             is NullNode -> NullCapture
             is IntNode -> PrimitiveCapture(CaptureType.INT, nullable = false)
             is BooleanNode -> PrimitiveCapture(CaptureType.BOOLEAN, nullable = false)
@@ -66,9 +66,10 @@ open class Typeanalyzer {
                 if (this.size() == 0) {
                     ListCapture(nullable = false, UnknownCapture)
                 } else {
-                    val subtype = this
-                        .map { it.toCapture() }
-                        .reduce { acc, other -> acc.reconcile(other) }
+                    val subtype =
+                        this
+                            .map { it.toCapture() }
+                            .reduce { acc, other -> acc.reconcile(other) }
                     ListCapture(nullable = false, subtype)
                 }
             }
@@ -81,5 +82,4 @@ open class Typeanalyzer {
             }
             else -> error("Unknown node-type: ${this::class.simpleName}")
         }
-    }
 }

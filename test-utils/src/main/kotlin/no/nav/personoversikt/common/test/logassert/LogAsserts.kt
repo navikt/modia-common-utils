@@ -11,11 +11,11 @@ import org.slf4j.event.Level
 import ch.qos.logback.classic.Logger as LogbackLogger
 import org.slf4j.Logger as Logger
 
-class LogAsserts(private val appender: ListAppender<ILoggingEvent>) {
+class LogAsserts(
+    private val appender: ListAppender<ILoggingEvent>,
+) {
     companion object {
-        fun captureLogs(block: () -> Unit): LogAsserts {
-            return LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).captureLogs(block)
-        }
+        fun captureLogs(block: () -> Unit): LogAsserts = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).captureLogs(block)
 
         fun Logger.captureLogs(block: () -> Unit): LogAsserts {
             this as LogbackLogger
@@ -40,7 +40,10 @@ class LogAsserts(private val appender: ListAppender<ILoggingEvent>) {
         return this
     }
 
-    fun logline(index: Int, block: MessageAsserter.() -> Unit): LogAsserts {
+    fun logline(
+        index: Int,
+        block: MessageAsserter.() -> Unit,
+    ): LogAsserts {
         MessageAsserter(appender.list[index]).apply(block)
         return this
     }
@@ -50,18 +53,23 @@ class LogAsserts(private val appender: ListAppender<ILoggingEvent>) {
         return this
     }
 
-    class MessageAsserter(private val event: ILoggingEvent) {
+    class MessageAsserter(
+        private val event: ILoggingEvent,
+    ) {
         private val markerMap: Map<String, Any?> by lazy {
             val map = mutableMapOf<String, Any?>()
-            val mapCapture = object : JsonGeneratorDelegate(null) {
-                lateinit var fieldname: String
-                override fun writeFieldName(name: String) {
-                    fieldname = name
+            val mapCapture =
+                object : JsonGeneratorDelegate(null) {
+                    lateinit var fieldname: String
+
+                    override fun writeFieldName(name: String) {
+                        fieldname = name
+                    }
+
+                    override fun writeObject(value: Any?) {
+                        map[fieldname] = value
+                    }
                 }
-                override fun writeObject(value: Any?) {
-                    map[fieldname] = value
-                }
-            }
             if (event.marker is StructuredArgument) {
                 (event.marker as StructuredArgument).writeTo(mapCapture)
             } else {
@@ -89,12 +97,18 @@ class LogAsserts(private val appender: ListAppender<ILoggingEvent>) {
             assertTrue(markerMap.containsKey(markername), "Could not find marker")
         }
 
-        fun markerValueEquals(markername: String, expectedValue: String) {
+        fun markerValueEquals(
+            markername: String,
+            expectedValue: String,
+        ) {
             hasMarker(markername)
             assertEquals(expectedValue, markerMap[markername], "Marker value did not match")
         }
 
-        fun markerValueContains(markername: String, expectedValue: String) {
+        fun markerValueContains(
+            markername: String,
+            expectedValue: String,
+        ) {
             hasMarker(markername)
             assertEquals(expectedValue, markerMap[markername], "Marker value did not match")
         }

@@ -13,16 +13,17 @@ internal class ProxySwitcherTest {
 
     @Test
     internal fun `enabled switch should use ifEnabled service`() {
-        val service: DummyService = ProxySwitcher.createSwitcher(
-            switch = { true },
-            ifEnabled = DummyService { "From enabled" },
-            ifDisabled = DummyService { "From disabled" },
-        )
+        val service: DummyService =
+            ProxySwitcher.createSwitcher(
+                switch = { true },
+                ifEnabled = DummyService { "From enabled" },
+                ifDisabled = DummyService { "From disabled" },
+            )
 
-        LogAsserts.captureLogs {
-            Assertions.assertEquals("From enabled", service.getData())
-        }
-            .hasSize(1)
+        LogAsserts
+            .captureLogs {
+                Assertions.assertEquals("From enabled", service.getData())
+            }.hasSize(1)
             .logline {
                 hasLevel(Level.WARN)
                 messageEquals("[ProxySwitcher] DummyService is enabled")
@@ -31,28 +32,32 @@ internal class ProxySwitcherTest {
 
     @Test
     internal fun `disabled switch should use ifDisabled service`() {
-        val service: DummyService = ProxySwitcher.createSwitcher(
-            switch = { false },
-            ifEnabled = DummyService { "From enabled" },
-            ifDisabled = DummyService { "From disabled" },
-        )
+        val service: DummyService =
+            ProxySwitcher.createSwitcher(
+                switch = { false },
+                ifEnabled = DummyService { "From enabled" },
+                ifDisabled = DummyService { "From disabled" },
+            )
 
-        LogAsserts.captureLogs {
-            Assertions.assertEquals("From disabled", service.getData())
-        }.hasSize(0)
+        LogAsserts
+            .captureLogs {
+                Assertions.assertEquals("From disabled", service.getData())
+            }.hasSize(0)
     }
 
     @Test
     internal fun `exceptions from underlying service should propagate without proxy-wrapper`() {
-        val service: DummyService = ProxySwitcher.createSwitcher(
-            switch = { true },
-            ifEnabled = DummyService { error("From enabled") },
-            ifDisabled = DummyService { error("From disabled") },
-        )
+        val service: DummyService =
+            ProxySwitcher.createSwitcher(
+                switch = { true },
+                ifEnabled = DummyService { error("From enabled") },
+                ifDisabled = DummyService { error("From disabled") },
+            )
 
-        val exception = assertThrows<IllegalStateException> {
-            service.getData()
-        }
+        val exception =
+            assertThrows<IllegalStateException> {
+                service.getData()
+            }
         Assertions.assertEquals("From enabled", exception.message)
     }
 }

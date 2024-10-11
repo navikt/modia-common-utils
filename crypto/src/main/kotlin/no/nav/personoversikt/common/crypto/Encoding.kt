@@ -7,14 +7,14 @@ object Encoding {
     private val decoder = Base64.getUrlDecoder()
 
     fun encode(bytes: ByteArray): String = encoder.encodeToString(bytes)
+
     fun decode(string: String): ByteArray = decoder.decode(string)
 
-    fun String.isBase64Encoded(): Boolean {
-        return try {
+    fun String.isBase64Encoded(): Boolean =
+        try {
             decoder.decode(this)
             true
         } catch (ex: Throwable) {
             false
         }
-    }
 }

@@ -15,37 +15,80 @@ interface TjenestekallLogger {
         ERROR,
     }
 
-    fun raw(level: Level, message: String, markers: Marker?, throwable: Throwable? = null)
-    fun info(header: String, fields: Fields, tags: Tags = emptyMap(), throwable: Throwable? = null)
-    fun warn(header: String, fields: Fields, tags: Tags = emptyMap(), throwable: Throwable? = null)
-    fun error(header: String, fields: Fields, tags: Tags = emptyMap(), throwable: Throwable? = null)
+    fun raw(
+        level: Level,
+        message: String,
+        markers: Marker?,
+        throwable: Throwable? = null,
+    )
+
+    fun info(
+        header: String,
+        fields: Fields,
+        tags: Tags = emptyMap(),
+        throwable: Throwable? = null,
+    )
+
+    fun warn(
+        header: String,
+        fields: Fields,
+        tags: Tags = emptyMap(),
+        throwable: Throwable? = null,
+    )
+
+    fun error(
+        header: String,
+        fields: Fields,
+        tags: Tags = emptyMap(),
+        throwable: Throwable? = null,
+    )
 }
+
 object TjenestekallLogg : TjenestekallLogger {
     val raw = Logging.secureLog
     private val logtypemap = mutableMapOf<String, TjenestekallLogger>()
     private val separator = "-".repeat(84)
 
-    fun withLogType(type: String): TjenestekallLogger {
-        return logtypemap.getOrPut(type) {
+    fun withLogType(type: String): TjenestekallLogger =
+        logtypemap.getOrPut(type) {
             object : TjenestekallLogger {
-                override fun info(header: String, fields: Fields, tags: Tags, throwable: Throwable?) {
+                override fun info(
+                    header: String,
+                    fields: Fields,
+                    tags: Tags,
+                    throwable: Throwable?,
+                ) {
                     TjenestekallLogg.info(header, fields, tags + (LOGTYPE_KEY to type), throwable)
                 }
 
-                override fun warn(header: String, fields: Fields, tags: Tags, throwable: Throwable?) {
+                override fun warn(
+                    header: String,
+                    fields: Fields,
+                    tags: Tags,
+                    throwable: Throwable?,
+                ) {
                     TjenestekallLogg.warn(header, fields, tags + (LOGTYPE_KEY to type), throwable)
                 }
 
-                override fun error(header: String, fields: Fields, tags: Tags, throwable: Throwable?) {
+                override fun error(
+                    header: String,
+                    fields: Fields,
+                    tags: Tags,
+                    throwable: Throwable?,
+                ) {
                     TjenestekallLogg.error(header, fields, tags + (LOGTYPE_KEY to type), throwable)
                 }
 
-                override fun raw(level: Level, message: String, markers: Marker?, throwable: Throwable?) {
+                override fun raw(
+                    level: Level,
+                    message: String,
+                    markers: Marker?,
+                    throwable: Throwable?,
+                ) {
                     TjenestekallLogg.raw(level, message, markers, throwable)
                 }
             }
         }
-    }
 
     override fun info(
         header: String,
@@ -65,33 +108,47 @@ object TjenestekallLogg : TjenestekallLogger {
         header: String,
         fields: Fields,
         tags: Tags,
-        throwable: Throwable?
+        throwable: Throwable?,
     ) = log(Level.ERROR, header, fields, tags, throwable)
 
-    override fun raw(level: Level, message: String, markers: Marker?, throwable: Throwable?) {
-        val loggerFn: (Marker?, String, Throwable?) -> Unit = when (level) {
-            Level.INFO -> raw::info
-            Level.WARN -> raw::warn
-            Level.ERROR -> raw::error
-        }
+    override fun raw(
+        level: Level,
+        message: String,
+        markers: Marker?,
+        throwable: Throwable?,
+    ) {
+        val loggerFn: (Marker?, String, Throwable?) -> Unit =
+            when (level) {
+                Level.INFO -> raw::info
+                Level.WARN -> raw::warn
+                Level.ERROR -> raw::error
+            }
         loggerFn(markers, message, throwable)
     }
 
-    fun format(header: String, fields: Map<String, Any?>): String = buildString {
-        appendLine(header)
-        appendSeparator()
-        for ((key, value) in fields) {
-            appendLine("$key: $value")
+    fun format(
+        header: String,
+        fields: Map<String, Any?>,
+    ): String =
+        buildString {
+            appendLine(header)
+            appendSeparator()
+            for ((key, value) in fields) {
+                appendLine("$key: $value")
+            }
+            appendSeparator()
         }
-        appendSeparator()
-    }
 
-    fun format(header: String, body: String): String = buildString {
-        appendLine(header)
-        appendSeparator()
-        appendLine(body)
-        appendSeparator()
-    }
+    fun format(
+        header: String,
+        body: String,
+    ): String =
+        buildString {
+            appendLine(header)
+            appendSeparator()
+            appendLine(body)
+            appendSeparator()
+        }
 
     private fun log(
         level: Level,

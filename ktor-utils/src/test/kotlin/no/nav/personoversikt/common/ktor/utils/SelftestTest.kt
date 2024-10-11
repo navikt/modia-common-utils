@@ -14,63 +14,67 @@ import kotlin.time.Duration.Companion.milliseconds
 
 internal class SelftestTest {
     @Test
-    internal fun `should mount a route at root without configuration`() = testApplication {
-        application {
-            install(Selftest.Plugin) {
-                appname = "testapp"
-                version = "1.0.0"
+    internal fun `should mount a route at root without configuration`() =
+        testApplication {
+            application {
+                install(Selftest.Plugin) {
+                    appname = "testapp"
+                    version = "1.0.0"
+                }
             }
-        }
 
-        assertNaisRoutes(
-            heading = "Should be ok if no reporters are registered",
-            isAlive = HttpStatusCode.OK,
-            isReady = HttpStatusCode.OK,
-        )
+            assertNaisRoutes(
+                heading = "Should be ok if no reporters are registered",
+                isAlive = HttpStatusCode.OK,
+                isReady = HttpStatusCode.OK,
+            )
 
-        assertSelftestContent(
-            content = """
+            assertSelftestContent(
+                content =
+                    """
                     Appname: testapp
                     Version: 1.0.0
                     
                     Status:
-            """.trimIndent()
-        )
-    }
+                    """.trimIndent(),
+            )
+        }
 
     @Test
-    internal fun `should mount a route at correct contextpath`() = testApplication {
-        application {
-            install(Selftest.Plugin) {
-                appname = "testapp"
-                version = "1.0.0"
-                contextpath = "myapp"
+    internal fun `should mount a route at correct contextpath`() =
+        testApplication {
+            application {
+                install(Selftest.Plugin) {
+                    appname = "testapp"
+                    version = "1.0.0"
+                    contextpath = "myapp"
+                }
             }
-        }
 
-        assertNaisRoutes(
-            heading = "Should be ok if no reporters are registered",
-            contextpath = "myapp",
-            isAlive = HttpStatusCode.OK,
-            isReady = HttpStatusCode.OK,
-        )
+            assertNaisRoutes(
+                heading = "Should be ok if no reporters are registered",
+                contextpath = "myapp",
+                isAlive = HttpStatusCode.OK,
+                isReady = HttpStatusCode.OK,
+            )
 
-        assertSelftestContent(
-            contextpath = "myapp",
-            content = """
+            assertSelftestContent(
+                contextpath = "myapp",
+                content =
+                    """
                     Appname: testapp
                     Version: 1.0.0
                     
                     Status:
-            """.trimIndent()
-        )
-    }
+                    """.trimIndent(),
+            )
+        }
 
     private suspend fun ApplicationTestBuilder.assertNaisRoutes(
         heading: String? = null,
         contextpath: String? = null,
         isAlive: HttpStatusCode,
-        isReady: HttpStatusCode
+        isReady: HttpStatusCode,
     ) {
         delay(50.milliseconds) // Allow changes to propagate to selftest
         val base = if (contextpath != null) "$contextpath/" else ""
@@ -95,11 +99,14 @@ internal class SelftestTest {
                             content = if (isReady == HttpStatusCode.OK) "Ready" else "Not ready",
                         )
                 }
-            }
+            },
         )
     }
 
-    private suspend fun ApplicationTestBuilder.assertSelftestContent(contextpath: String? = null, content: String) {
+    private suspend fun ApplicationTestBuilder.assertSelftestContent(
+        contextpath: String? = null,
+        content: String,
+    ) {
         delay(50.milliseconds) // Allow changes to propagate to selftest
         val base = if (contextpath != null) "$contextpath/" else ""
         client
@@ -110,7 +117,10 @@ internal class SelftestTest {
             )
     }
 
-    private suspend fun HttpResponse.assertEquals(status: HttpStatusCode, content: String) {
+    private suspend fun HttpResponse.assertEquals(
+        status: HttpStatusCode,
+        content: String,
+    ) {
         assertEquals(status, this.status)
         assertEquals(content, bodyAsText().trim())
     }

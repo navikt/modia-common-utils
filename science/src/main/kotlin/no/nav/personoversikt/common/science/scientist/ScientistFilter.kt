@@ -7,7 +7,11 @@ import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 
 class ScientistFilter : Filter {
-    override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+    override fun doFilter(
+        request: ServletRequest,
+        response: ServletResponse,
+        chain: FilterChain,
+    ) {
         val req = request as HttpServletRequest
         if (req.queryString?.contains("forceExperiment") == true) {
             Scientist.forceExperiment.set(true)

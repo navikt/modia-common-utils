@@ -10,14 +10,17 @@ import org.junit.jupiter.api.extension.ParameterContext
 import java.util.*
 
 object PlainJsonSnapshowExtension : SnapshotExtension(format = JsonSnapshotFormat.plain) {
-    override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
-        return parameterContext.parameter.type == PlainJsonSnapshowExtension::class.java
-    }
+    override fun supportsParameter(
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext,
+    ): Boolean = parameterContext.parameter.type == PlainJsonSnapshowExtension::class.java
 }
+
 object TextSnapshowExtension : SnapshotExtension(format = TextSnapshotFormat) {
-    override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
-        return parameterContext.parameter.type == TextSnapshowExtension::class.java
-    }
+    override fun supportsParameter(
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext,
+    ): Boolean = parameterContext.parameter.type == TextSnapshowExtension::class.java
 }
 
 @ExtendWith(SnapshotExtension::class)
@@ -31,7 +34,7 @@ internal class AnnotatedSnapshotExtensionTest(
     data class DummyObject(
         val id: UUID = UUID.fromString("ab76e36b-5001-4716-b5d6-d0c0cf95a412"),
         val name: String = "myname",
-        val list: List<Int> = listOf(1, 2, 3)
+        val list: List<Int> = listOf(1, 2, 3),
     )
 
     @Test

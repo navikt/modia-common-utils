@@ -7,10 +7,8 @@ fun interface Rate {
 
     class FixedValue(
         private val rate: Double,
-        private val random: Random = Random.Default
+        private val random: Random = Random.Default,
     ) : Rate {
-        override fun evaluate(): Boolean {
-            return random.nextDouble() < rate
-        }
+        override fun evaluate(): Boolean = random.nextDouble() < rate
     }
 }

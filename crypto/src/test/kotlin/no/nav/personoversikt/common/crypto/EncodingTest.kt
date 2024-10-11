@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import java.util.Base64
 
 internal class EncodingTest {
-
     @Test
     internal fun `should use urlBase64Encoder`() {
         val plaintext = "dummy"

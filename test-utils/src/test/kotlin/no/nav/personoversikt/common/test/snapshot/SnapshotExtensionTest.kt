@@ -22,7 +22,7 @@ internal class SnapshotExtensionTest {
     data class DummyObject(
         val id: UUID = UUID.fromString("ab76e36b-5001-4716-b5d6-d0c0cf95a412"),
         val name: String = "myname",
-        val list: List<Int> = listOf(1, 2, 3)
+        val list: List<Int> = listOf(1, 2, 3),
     )
 
     @Test

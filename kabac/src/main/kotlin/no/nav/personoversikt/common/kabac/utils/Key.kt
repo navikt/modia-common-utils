@@ -2,7 +2,9 @@ package no.nav.personoversikt.common.kabac.utils
 
 import no.nav.personoversikt.common.kabac.AttributeValue
 
-class Key<TYPE>(val name: String) {
+class Key<TYPE>(
+    val name: String,
+) {
     init {
         if (name.isEmpty()) {
             throw IllegalStateException("Key name cannot be empty")
@@ -12,7 +14,9 @@ class Key<TYPE>(val name: String) {
     fun withValue(value: TYPE) = AttributeValue(this, value)
 
     override fun toString(): String = "Key($name)"
+
     override fun hashCode(): Int = name.hashCode()
+
     override fun equals(other: Any?): Boolean = name == other
 
     companion object {

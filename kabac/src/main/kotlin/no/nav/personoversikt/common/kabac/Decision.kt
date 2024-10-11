@@ -1,14 +1,17 @@
 package no.nav.personoversikt.common.kabac
 
-sealed class Decision(var type: Type) {
+sealed class Decision(
+    var type: Type,
+) {
     interface DenyCause
 
     enum class Type { PERMIT, DENY, NOT_APPLICABLE }
 
-    fun isApplicable(): Boolean = when (this) {
-        is Permit, is Deny -> true
-        is NotApplicable -> false
-    }
+    fun isApplicable(): Boolean =
+        when (this) {
+            is Permit, is Deny -> true
+            is NotApplicable -> false
+        }
 
     fun withBias(bias: Type): Decision {
         if (isApplicable()) {
@@ -22,6 +25,7 @@ sealed class Decision(var type: Type) {
     }
 
     override fun hashCode(): Int = type.hashCode()
+
     override fun equals(other: Any?): Boolean {
         if (other is Decision) {
             return type == other.type
@@ -32,10 +36,17 @@ sealed class Decision(var type: Type) {
     class Permit : Decision(Type.PERMIT) {
         override fun toString() = "Permit"
     }
-    class Deny(val message: String, val cause: DenyCause) : Decision(Type.DENY) {
+
+    class Deny(
+        val message: String,
+        val cause: DenyCause,
+    ) : Decision(Type.DENY) {
         override fun toString() = "Deny($message)"
     }
-    class NotApplicable(val message: String? = null) : Decision(Type.NOT_APPLICABLE) {
+
+    class NotApplicable(
+        val message: String? = null,
+    ) : Decision(Type.NOT_APPLICABLE) {
         override fun toString(): String {
             val msg = message?.let { "($it)" } ?: ""
             return "NotApplicable$msg"

@@ -16,22 +16,24 @@ data class RootObject(
 
 data class Stuff(
     val id: UUID? = null,
-    val meta: Map<String, String?>? = null
+    val meta: Map<String, String?>? = null,
 )
 
-val valueObject = RootObject(
-    id = "id",
-    nullValue = null,
-    active = true,
-    count = 123,
-    countLong = 123,
-    fraction = 0.3,
-    fractionFloat = 0.3f,
-    emptyArray = emptyArray(),
-    listOfStuff = listOf(
-        Stuff(
-            id = UUID.randomUUID(),
-            meta = mapOf("key" to "value", "key2" to "other")
-        ),
+val valueObject =
+    RootObject(
+        id = "id",
+        nullValue = null,
+        active = true,
+        count = 123,
+        countLong = 123,
+        fraction = 0.3,
+        fractionFloat = 0.3f,
+        emptyArray = emptyArray(),
+        listOfStuff =
+            listOf(
+                Stuff(
+                    id = UUID.randomUUID(),
+                    meta = mapOf("key" to "value", "key2" to "other"),
+                ),
+            ),
     )
-)

@@ -8,8 +8,9 @@ class SnapshotRule(
     path: String = "src/test/resources/snapshots",
     format: SnapshotRunner.Fileformat = JsonSnapshotFormat,
     debug: Boolean = false,
-    private val runner: SnapshotRunnerImpl = SnapshotRunnerImpl(path, format, debug)
-) : TestWatcher(), SnapshotRunner by runner {
+    private val runner: SnapshotRunnerImpl = SnapshotRunnerImpl(path, format, debug),
+) : TestWatcher(),
+    SnapshotRunner by runner {
     override fun starting(description: Description) {
         runner.beforeSnapshotRunner("${description.className}_${description.methodName}")
     }

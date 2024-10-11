@@ -6,8 +6,9 @@ import no.nav.personoversikt.common.kabac.utils.Key
 import no.nav.personoversikt.common.kabac.utils.KeyStack
 
 class EvaluationContextImpl(
-    providers: List<Kabac.PolicyInformationPoint<*>>
-) : Kabac.EvaluationContext, Kabac.EvaluationReporter by EvaluationReporterImpl() {
+    providers: List<Kabac.PolicyInformationPoint<*>>,
+) : Kabac.EvaluationContext,
+    Kabac.EvaluationReporter by EvaluationReporterImpl() {
     private val register = providers.associateBy { it.key }
     private val cache = mutableMapOf<Key<*>, Any?>()
     private val keystack = KeyStack()
@@ -15,8 +16,8 @@ class EvaluationContextImpl(
     override fun <TValue> getValue(attributeKey: Kabac.AttributeKey<TValue>): TValue = getValue(attributeKey.key)
 
     @Suppress("UNCHECKED_CAST")
-    override fun <TValue> getValue(key: Key<TValue>): TValue {
-        return keystack.withCycleDetection(key) {
+    override fun <TValue> getValue(key: Key<TValue>): TValue =
+        keystack.withCycleDetection(key) {
             if (cache.containsKey(key)) {
                 val value = cache[key] as TValue
                 report("Requested $key, cache-hit")
@@ -34,7 +35,6 @@ class EvaluationContextImpl(
                 value
             }
         }
-    }
 
     companion object {
         operator fun invoke(vararg providers: Kabac.PolicyInformationPoint<*>) = EvaluationContextImpl(providers.toList())
