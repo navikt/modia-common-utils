@@ -10,7 +10,7 @@ object KtorServer {
         factory: ApplicationEngineFactory<TEngine, TConfiguration>,
         port: Int = 8080,
         application: Application.() -> Unit,
-    ): TEngine {
+    ): EmbeddedServer<TEngine, TConfiguration> {
         val server = embeddedServer(factory, port) {
             application()
         }
