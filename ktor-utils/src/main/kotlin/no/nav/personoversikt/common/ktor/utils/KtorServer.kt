@@ -10,12 +10,26 @@ object KtorServer {
     fun <TEngine : ApplicationEngine, TConfiguration : ApplicationEngine.Configuration> create(
         factory: ApplicationEngineFactory<TEngine, TConfiguration>,
         port: Int = 8080,
+        configure: TConfiguration.() -> Unit = {},
         application: Application.() -> Unit,
     ): EmbeddedServer<TEngine, TConfiguration> {
         val server =
-            embeddedServer(factory, port) {
-                application()
-            }
+            embeddedServer(
+                factory,
+                serverConfig(applicationEnvironment()) {
+                    module {
+                        application()
+                    }
+                },
+                configure = {
+                    connectors.add(
+                        EngineConnectorBuilder().apply {
+                            this.port = port
+                        },
+                    )
+                    configure()
+                },
+            )
 
         Runtime.getRuntime().addShutdownHook(
             Thread {
