@@ -30,7 +30,7 @@
         <logstash.version>8.0</logstash.version>
         <jackson.version>2.18.2</jackson.version>
         <junit.version>5.12.0</junit.version>
-        <mockk.version>1.13.16</mockk.version>
+        <mockk.version>1.13.17</mockk.version>
     </properties>
 
     <licenses>
