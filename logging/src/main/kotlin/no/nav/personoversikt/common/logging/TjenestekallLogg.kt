@@ -46,6 +46,7 @@ interface TjenestekallLogger {
 
 object TjenestekallLogg : TjenestekallLogger {
     val raw = Logging.secureLog
+    val teamRaw = Logging.teamLog
     private val logtypemap = mutableMapOf<String, TjenestekallLogger>()
     private val separator = "-".repeat(84)
 
@@ -124,6 +125,21 @@ object TjenestekallLogg : TjenestekallLogger {
                 Level.ERROR -> raw::error
             }
         loggerFn(markers, message, throwable)
+
+        // Send logger til team logs parallell med secure logs i første omgang
+        val teamMarkers =
+            Markers.append(Logging.TEAM_LOGS_MARKER, "true").let { teamMarker ->
+                markers?.let { teamMarker.and(it) }
+                    ?: teamMarker
+            }
+
+        val teamLoggerFn: (Marker?, String, Throwable?) -> Unit =
+            when (level) {
+                Level.INFO -> teamRaw::info
+                Level.WARN -> teamRaw::warn
+                Level.ERROR -> teamRaw::error
+            }
+        teamLoggerFn(teamMarkers, message, throwable)
     }
 
     fun format(
