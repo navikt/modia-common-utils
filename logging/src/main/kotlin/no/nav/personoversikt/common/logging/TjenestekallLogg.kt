@@ -127,19 +127,13 @@ object TjenestekallLogg : TjenestekallLogger {
         loggerFn(markers, message, throwable)
 
         // Send logger til team logs parallell med secure logs i første omgang
-        val teamMarkers =
-            Markers.append(Logging.TEAM_LOGS_MARKER, "true").let { teamMarker ->
-                markers?.let { teamMarker.and(it) }
-                    ?: teamMarker
-            }
-
         val teamLoggerFn: (Marker?, String, Throwable?) -> Unit =
             when (level) {
                 Level.INFO -> teamRaw::info
                 Level.WARN -> teamRaw::warn
                 Level.ERROR -> teamRaw::error
             }
-        teamLoggerFn(teamMarkers, message, throwable)
+        teamLoggerFn(Logging.TEAM_LOGS_MARKER, message, throwable)
     }
 
     fun format(
