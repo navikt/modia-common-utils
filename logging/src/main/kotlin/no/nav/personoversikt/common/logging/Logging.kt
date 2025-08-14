@@ -8,7 +8,6 @@ import org.slf4j.MarkerFactory
 object Logging {
     const val LOGTYPE_KEY = "logtype"
     val TEAM_LOGS_MARKER: Marker = MarkerFactory.getMarker("TEAM_LOGS")
-    val secureLog: Logger = LoggerFactory.getLogger("SecureLog")
+    val secureLog: Logger = LoggerFactory.getLogger("TeamLog")
     val auditLog: Logger = LoggerFactory.getLogger("AuditLogger")
-    val teamLog: Logger = LoggerFactory.getLogger("TeamLog")
 }
