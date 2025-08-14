@@ -124,8 +124,10 @@ object TjenestekallLogg : TjenestekallLogger {
                 Level.ERROR -> raw::error
             }
 
-        val aggregatedMarkers = if (markers != null) Markers.aggregate(markers, Logging.TEAM_LOGS_MARKER) else Logging.TEAM_LOGS_MARKER
-        loggerFn(aggregatedMarkers, message, throwable)
+        if (markers != null) {
+            markers.add(Logging.TEAM_LOGS_MARKER)
+        }
+        loggerFn(markers ?: Logging.TEAM_LOGS_MARKER, message, throwable)
     }
 
     fun format(
