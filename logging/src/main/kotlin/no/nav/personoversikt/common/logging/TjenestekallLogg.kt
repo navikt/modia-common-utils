@@ -45,7 +45,7 @@ interface TjenestekallLogger {
 }
 
 object TjenestekallLogg : TjenestekallLogger {
-    val raw = Logging.secureLog
+    val raw = Logging.teamLog
     private val logtypemap = mutableMapOf<String, TjenestekallLogger>()
     private val separator = "-".repeat(84)
 
