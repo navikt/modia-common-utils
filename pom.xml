@@ -19,7 +19,7 @@
     <name>modia-common-utils</name>
 
     <properties>
-        <kotlin.version>2.2.20</kotlin.version>
+        <kotlin.version>2.2.21</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlinx.serialization.version>1.8.1</kotlinx.serialization.version>
         <ktor.version>3.3.2</ktor.version>
