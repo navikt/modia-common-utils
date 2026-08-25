@@ -14,7 +14,7 @@ interface Format {
         val nullability: Boolean,
     )
 
-    context(StringBuilder)
+    context(stringBuilder: StringBuilder)
     fun appendType(type: Type)
 
     fun fieldType(
@@ -24,13 +24,13 @@ interface Format {
 }
 
 object TypescriptFormat : Format {
-    context(StringBuilder)
+    context(stringBuilder: StringBuilder)
     override fun appendType(type: Format.Type) {
-        appendLine("interface ${type.name} {")
+        stringBuilder.appendLine("interface ${type.name} {")
         for (field in type.fields) {
-            appendLine("  ${field.name}: ${field.type}${if (field.nullability) " | null" else ""},")
+            stringBuilder.appendLine("  ${field.name}: ${field.type}${if (field.nullability) " | null" else ""},")
         }
-        appendLine("}")
+        stringBuilder.appendLine("}")
     }
 
     override fun fieldType(
@@ -50,13 +50,13 @@ object TypescriptFormat : Format {
 }
 
 object KotlinFormat : Format {
-    context(StringBuilder)
+    context(stringBuilder: StringBuilder)
     override fun appendType(type: Format.Type) {
-        appendLine("data class ${type.name}(")
+        stringBuilder.appendLine("data class ${type.name}(")
         for (field in type.fields) {
-            appendLine("    val ${field.name}: ${field.type}${if (field.nullability) "?" else ""},")
+            stringBuilder.appendLine("    val ${field.name}: ${field.type}${if (field.nullability) "?" else ""},")
         }
-        appendLine(")")
+        stringBuilder.appendLine(")")
     }
 
     override fun fieldType(

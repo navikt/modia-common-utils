@@ -174,9 +174,6 @@
                     <compilerPlugins>
                         <plugin>kotlinx-serialization</plugin>
                     </compilerPlugins>
-                    <args>
-                        <arg>-Xcontext-receivers</arg>
-                    </args>
                 </configuration>
                 <dependencies>
                     <dependency>
