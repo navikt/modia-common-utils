@@ -27,7 +27,7 @@
         <prometheus.version>1.17.0</prometheus.version>
         <logback.version>1.6.3</logback.version>
         <slf4j.version>2.0.18</slf4j.version>
-        <logstash.version>8.1</logstash.version>
+        <logstash.version>9.0</logstash.version>
         <jackson.version>2.22.2</jackson.version>
         <junit.version>6.1.3</junit.version>
         <mockk.version>1.14.11</mockk.version>
