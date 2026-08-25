@@ -102,8 +102,14 @@ class Formatter(
                     .plus(this to createType(this))
                     .plus(fieldTypes)
             }
-            is ListCapture -> current.plus(this.subtype.findTypes())
-            else -> current
+
+            is ListCapture -> {
+                current.plus(this.subtype.findTypes())
+            }
+
+            else -> {
+                current
+            }
         }
 
     private fun createType(capture: ObjectCapture): Format.Type {
@@ -132,11 +138,18 @@ class Formatter(
 
     private fun createTypeName(capture: Capture): String =
         when (capture) {
-            is ListCapture -> format.fieldType(capture.type, createTypeName(capture.subtype))
-            is ObjectCapture ->
+            is ListCapture -> {
+                format.fieldType(capture.type, createTypeName(capture.subtype))
+            }
+
+            is ObjectCapture -> {
                 nameMap.computeIfAbsent(capture) {
                     "Generated_${Integer.toHexString(rnd.nextInt())}"
                 }
-            else -> format.fieldType(capture.type, null)
+            }
+
+            else -> {
+                format.fieldType(capture.type, null)
+            }
         }
 }

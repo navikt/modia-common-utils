@@ -57,11 +57,26 @@ open class Typeanalyzer {
 
     private fun JsonNode.toCapture(): Capture =
         when (this) {
-            is NullNode -> NullCapture
-            is IntNode -> PrimitiveCapture(CaptureType.INT, nullable = false)
-            is BooleanNode -> PrimitiveCapture(CaptureType.BOOLEAN, nullable = false)
-            is DoubleNode -> PrimitiveCapture(CaptureType.DOUBLE, nullable = false)
-            is TextNode -> PrimitiveCapture(CaptureType.TEXT, nullable = false)
+            is NullNode -> {
+                NullCapture
+            }
+
+            is IntNode -> {
+                PrimitiveCapture(CaptureType.INT, nullable = false)
+            }
+
+            is BooleanNode -> {
+                PrimitiveCapture(CaptureType.BOOLEAN, nullable = false)
+            }
+
+            is DoubleNode -> {
+                PrimitiveCapture(CaptureType.DOUBLE, nullable = false)
+            }
+
+            is TextNode -> {
+                PrimitiveCapture(CaptureType.TEXT, nullable = false)
+            }
+
             is ArrayNode -> {
                 if (this.size() == 0) {
                     ListCapture(nullable = false, UnknownCapture)
@@ -73,6 +88,7 @@ open class Typeanalyzer {
                     ListCapture(nullable = false, subtype)
                 }
             }
+
             is ObjectNode -> {
                 val fields = mutableMapOf<String, Capture>()
                 this.fields().forEach { entry ->
@@ -80,6 +96,9 @@ open class Typeanalyzer {
                 }
                 ObjectCapture(nullable = false, fields)
             }
-            else -> error("Unknown node-type: ${this::class.simpleName}")
+
+            else -> {
+                error("Unknown node-type: ${this::class.simpleName}")
+            }
         }
 }

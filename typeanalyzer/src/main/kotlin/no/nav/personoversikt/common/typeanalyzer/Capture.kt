@@ -26,15 +26,39 @@ data class ObjectCapture(
 fun Capture.reconcile(other: Capture): Capture =
     if (this.type != other.type) {
         when {
-            this == UnknownCapture -> other
-            other == UnknownCapture -> this
-            this == NullCapture && other is PrimitiveCapture -> other.copy(nullable = true)
-            this == NullCapture && other is ListCapture -> other.copy(nullable = true)
-            this == NullCapture && other is ObjectCapture -> other.copy(nullable = true)
-            this is PrimitiveCapture && other == NullCapture -> this.copy(nullable = true)
-            this is ListCapture && other == NullCapture -> this.copy(nullable = true)
-            this is ObjectCapture && other == NullCapture -> this.copy(nullable = true)
-            else ->
+            this == UnknownCapture -> {
+                other
+            }
+
+            other == UnknownCapture -> {
+                this
+            }
+
+            this == NullCapture && other is PrimitiveCapture -> {
+                other.copy(nullable = true)
+            }
+
+            this == NullCapture && other is ListCapture -> {
+                other.copy(nullable = true)
+            }
+
+            this == NullCapture && other is ObjectCapture -> {
+                other.copy(nullable = true)
+            }
+
+            this is PrimitiveCapture && other == NullCapture -> {
+                this.copy(nullable = true)
+            }
+
+            this is ListCapture && other == NullCapture -> {
+                this.copy(nullable = true)
+            }
+
+            this is ObjectCapture && other == NullCapture -> {
+                this.copy(nullable = true)
+            }
+
+            else -> {
                 error(
                     """
                     Type mismatch, and could not reconcile typoes. Expected type ${this.type}, but got ${other.type}
@@ -42,10 +66,14 @@ fun Capture.reconcile(other: Capture): Capture =
                     Other: $other
                     """.trimIndent(),
                 )
+            }
         }
     } else {
         when (this) {
-            is PrimitiveCapture -> this.copy(nullable = this.nullable or (other as PrimitiveCapture).nullable)
+            is PrimitiveCapture -> {
+                this.copy(nullable = this.nullable or (other as PrimitiveCapture).nullable)
+            }
+
             is ListCapture -> {
                 (other as ListCapture)
                 this.copy(
@@ -53,6 +81,7 @@ fun Capture.reconcile(other: Capture): Capture =
                     subtype = this.subtype.reconcile(other.subtype),
                 )
             }
+
             is ObjectCapture -> {
                 (other as ObjectCapture)
                 val commonkeys =
@@ -83,6 +112,9 @@ fun Capture.reconcile(other: Capture): Capture =
                     fields = commonkeys + newkeys + missingkeys,
                 )
             }
-            else -> this
+
+            else -> {
+                this
+            }
         }
     }
