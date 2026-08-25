@@ -19,7 +19,7 @@
     <name>modia-common-utils</name>
 
     <properties>
-        <kotlin.version>2.3.10</kotlin.version>
+        <kotlin.version>2.4.10</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlinx.serialization.version>1.11.0</kotlinx.serialization.version>
         <ktor.version>3.5.2</ktor.version>
@@ -174,9 +174,6 @@
                     <compilerPlugins>
                         <plugin>kotlinx-serialization</plugin>
                     </compilerPlugins>
-                    <args>
-                        <arg>-Xcontext-receivers</arg>
-                    </args>
                 </configuration>
                 <dependencies>
                     <dependency>

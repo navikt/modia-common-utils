@@ -36,8 +36,14 @@ private class DecisionOverride(
                                     .report("Last decision matches override value. Stopping policy evaluation.")
                                 return policyDecision
                             }
-                            Decision.Type.NOT_APPLICABLE -> decision
-                            else -> policyDecision
+
+                            Decision.Type.NOT_APPLICABLE -> {
+                                decision
+                            }
+
+                            else -> {
+                                policyDecision
+                            }
                         }
                     ctx.unindent()
                 }

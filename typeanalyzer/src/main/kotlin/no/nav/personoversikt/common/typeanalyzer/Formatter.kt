@@ -14,7 +14,7 @@ interface Format {
         val nullability: Boolean,
     )
 
-    context(StringBuilder)
+    context(stringBuilder: StringBuilder)
     fun appendType(type: Type)
 
     fun fieldType(
@@ -24,13 +24,13 @@ interface Format {
 }
 
 object TypescriptFormat : Format {
-    context(StringBuilder)
+    context(stringBuilder: StringBuilder)
     override fun appendType(type: Format.Type) {
-        appendLine("interface ${type.name} {")
+        stringBuilder.appendLine("interface ${type.name} {")
         for (field in type.fields) {
-            appendLine("  ${field.name}: ${field.type}${if (field.nullability) " | null" else ""},")
+            stringBuilder.appendLine("  ${field.name}: ${field.type}${if (field.nullability) " | null" else ""},")
         }
-        appendLine("}")
+        stringBuilder.appendLine("}")
     }
 
     override fun fieldType(
@@ -50,13 +50,13 @@ object TypescriptFormat : Format {
 }
 
 object KotlinFormat : Format {
-    context(StringBuilder)
+    context(stringBuilder: StringBuilder)
     override fun appendType(type: Format.Type) {
-        appendLine("data class ${type.name}(")
+        stringBuilder.appendLine("data class ${type.name}(")
         for (field in type.fields) {
-            appendLine("    val ${field.name}: ${field.type}${if (field.nullability) "?" else ""},")
+            stringBuilder.appendLine("    val ${field.name}: ${field.type}${if (field.nullability) "?" else ""},")
         }
-        appendLine(")")
+        stringBuilder.appendLine(")")
     }
 
     override fun fieldType(
@@ -102,8 +102,14 @@ class Formatter(
                     .plus(this to createType(this))
                     .plus(fieldTypes)
             }
-            is ListCapture -> current.plus(this.subtype.findTypes())
-            else -> current
+
+            is ListCapture -> {
+                current.plus(this.subtype.findTypes())
+            }
+
+            else -> {
+                current
+            }
         }
 
     private fun createType(capture: ObjectCapture): Format.Type {
@@ -132,11 +138,18 @@ class Formatter(
 
     private fun createTypeName(capture: Capture): String =
         when (capture) {
-            is ListCapture -> format.fieldType(capture.type, createTypeName(capture.subtype))
-            is ObjectCapture ->
+            is ListCapture -> {
+                format.fieldType(capture.type, createTypeName(capture.subtype))
+            }
+
+            is ObjectCapture -> {
                 nameMap.computeIfAbsent(capture) {
                     "Generated_${Integer.toHexString(rnd.nextInt())}"
                 }
-            else -> format.fieldType(capture.type, null)
+            }
+
+            else -> {
+                format.fieldType(capture.type, null)
+            }
         }
 }
