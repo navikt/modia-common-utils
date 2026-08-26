@@ -2,12 +2,13 @@ package no.nav.personoversikt.common.test.logassert
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
-import com.fasterxml.jackson.core.util.JsonGeneratorDelegate
 import net.logstash.logback.argument.StructuredArgument
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
+import tools.jackson.core.JsonGenerator
+import tools.jackson.core.util.JsonGeneratorDelegate
 import ch.qos.logback.classic.Logger as LogbackLogger
 import org.slf4j.Logger as Logger
 
@@ -58,16 +59,18 @@ class LogAsserts(
     ) {
         private val markerMap: Map<String, Any?> by lazy {
             val map = mutableMapOf<String, Any?>()
-            val mapCapture =
+            val mapCapture: JsonGeneratorDelegate =
                 object : JsonGeneratorDelegate(null) {
                     lateinit var fieldname: String
 
-                    override fun writeFieldName(name: String) {
+                    override fun writeName(name: String): JsonGenerator {
                         fieldname = name
+                        return this
                     }
 
-                    override fun writeObject(value: Any?) {
+                    override fun writePOJO(value: Any?): JsonGenerator {
                         map[fieldname] = value
+                        return this
                     }
                 }
             if (event.marker is StructuredArgument) {
